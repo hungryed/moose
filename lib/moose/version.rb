@@ -1,3 +1,3 @@
-module Moose
+module Meese
   VERSION = "0.1.0"
 end

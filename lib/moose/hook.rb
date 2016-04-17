@@ -1,0 +1,5 @@
+require_relative "hook/collection"
+require_relative "hook/hook_helper"
+require_relative "hook/base"
+require_relative "hook/before"
+require_relative "hook/after"
