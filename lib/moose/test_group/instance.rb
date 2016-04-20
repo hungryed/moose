@@ -42,13 +42,12 @@ module Meese
       private
 
       def run_in_threads(opts = {})
-        test_case_cache.each_slice(moose_config.test_thread_count) do |test_case_set|
+        trim_test_cases_from(opts).each_slice(moose_config.test_thread_count) do |test_case_set|
           threads = []
           test_case_set.each_with_index do |(name, test_case), index|
-            # Meese.log.add_to_log("-Test Case: #{name} started\n")
             threads << Thread.new do
-              ::Meese.run_test_case_with_hooks(
-                test_group: self,
+              run_test_case(
+                name: name,
                 test_case: test_case,
                 options: opts
               )
@@ -59,16 +58,26 @@ module Meese
       end
 
       def run_out_of_threads(opts = {})
-        test_case_cache.each_with_index do |(name, test_case), index|
-          # Meese.log.add_to_log("-Test Case: #{name} started\n")
-          configuration.call_hooks_with_entity(test_case) do
-            ::Meese.run_test_case_with_hooks(
-              test_group: self,
-              test_case: test_case,
-              options: opts
-            )
-          end
+        trim_test_cases_from(opts).each_with_index do |(name, test_case), index|
+          run_test_case(
+            name: name,
+            test_case: test_case,
+            options: opts
+          )
         end
+      end
+
+      def run_test_case(name:, test_case:, options: {})
+        # Meese.log.add_to_log("-Test Case: #{name} started\n")
+        ::Meese.run_test_case_with_hooks(
+          test_group: self,
+          test_case: test_case,
+          options: opts
+        )
+      end
+
+      def trim_test_cases_from(opts = {})
+        test_case_cache
       end
 
       def results

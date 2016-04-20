@@ -3,9 +3,11 @@ require_relative "aggregator"
 module Meese
   module Suite
     class Runner
+      attr_accessor :start_time, :end_time
+
       class << self
-        def run!
-          instance.run!
+        def run!(options = {})
+          instance.run!(options)
         end
 
         def instance
@@ -50,27 +52,31 @@ module Meese
         # Meese.log.start_log
         # Meese.log.add_to_log("Browser: #{Meese.chosen_browser}")
         # Meese.log.add_to_log("Base URL: #{@base_url}\n\n")
-        # Meese.msg.starting("#{Meese.suite_name} Start")
         test_suites #want to initialize test suites before clearing the save_failure_yml...
         # Meese.log.backup_yml_logs
         # Meese.msg.warn(">==================> copying ./_#{Meese.current_suite.suite_name}_testlog.yml to: _prev_test_testlog.yml!!")
         # Meese.msg.warn(">=======================> clearing ./_#{Meese.current_suite.suite_name}_testlog.yml !!")
       end
 
-      def run!
-        initialize_run
-        test_suites.each_with_index do |suite, i|
-          start_suite_time = Time.now
-          # Meese.log.add_to_log("-Test Case Group: #{suite.name} started\n")
-          Meese.msg.invert(":Test Group #{i+1} of #{test_suites.count}")
-          results << suite.run!({})
-          # results += suite.run!(:session_type => session_type, :base_url => base_url, :snapshot_dir => snapshot_directory)
+      def run!(opts = {})
+        # Meese.msg.starting("#{Meese.suite_name} Start")
+        self.start_time = Time.now
+        configuration.suite_hook_collection.call_hooks_with_entity(configuration, opts) do
+          initialize_run
+          test_suites.each_with_index do |suite, i|
+            start_suite_time = Time.now
+            # Meese.log.add_to_log("-Test Case Group: #{suite.name} started\n")
+            Meese.msg.invert(":Test Group #{i+1} of #{test_suites.count}")
+            results << suite.run!(opts)
+            # results += suite.run!(:session_type => session_type, :base_url => base_url, :snapshot_dir => snapshot_directory)
 
-          suite_time_took = Time.now - start_suite_time
-          # Meese.log.add_to_log("-Test Case Group: #{suite.name} completed in #{suite_time_took}\n\n")
+            suite_time_took = Time.now - start_suite_time
+            # Meese.log.add_to_log("-Test Case Group: #{suite.name} completed in #{suite_time_took}\n\n")
+          end
+          # end_test(results)
         end
-
-        # end_test(results)
+        self.end_time = Time.now
+        self
       end
 
       def configuration

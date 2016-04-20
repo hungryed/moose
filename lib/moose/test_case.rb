@@ -24,6 +24,10 @@ module Meese
       test_case.test_group.test_suite.locators.cache
     end
 
+    def base_url
+      test_group.test_suite.configuration.base_url
+    end
+
     def browser(index: nil, options: {})
       if index
         browsers[index]
@@ -46,8 +50,7 @@ module Meese
     def run!(opts={})
       self.start_time = Time.now
       begin
-        # require 'pry'; binding.pry; 1
-        test_block.call(self)
+        result = test_block.call(self)
         pass!
       rescue => e
         self.exception = e
@@ -72,11 +75,11 @@ module Meese
       remove_browsers
     end
 
-    private
-
     def browsers
       @browsers ||= []
     end
+
+    private
 
     def remove_browsers
       browsers.each do |b|

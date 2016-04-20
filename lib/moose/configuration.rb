@@ -23,7 +23,8 @@ module Meese
       :run_in_threads => false,
       :test_thread_count => 5,
       :headless => false,
-      :browser => :chrome
+      :browser => :chrome,
+      :rerun_failed => false,
     }
 
     attr_accessor *DEFAULTS.keys
@@ -47,6 +48,18 @@ module Meese
         count = 1
       end
       @test_thread_count = count
+    end
+
+    def suite_hook_collection
+      @suite_hook_collection ||= Hook::Collection.new
+    end
+
+    def add_before_suite_hook(*args, &block)
+      create_before_hook_from(collection: suite_hook_collection, args: args, block: block)
+    end
+
+    def add_after_suite_hook(*args, &block)
+      create_after_hook_from(collection: suite_hook_collection, args: args, block: block)
     end
 
     def run_test_case_with_hooks(test_case, *args, &block)

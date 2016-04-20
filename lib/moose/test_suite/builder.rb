@@ -12,11 +12,6 @@ module Meese
         test_suite_instance.build_dependencies
         test_suite_instance
       end
-
-      def config
-        @config ||= Meese.configuration
-      end
-
     end
   end
 end

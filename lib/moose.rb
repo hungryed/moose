@@ -4,6 +4,7 @@ require 'colorize'
 require 'json'
 
 require "moose/version"
+require "moose/assertions"
 require 'moose/hook'
 require "moose/configuration"
 require "moose/world"
@@ -13,6 +14,8 @@ require 'moose/suite'
 
 module Meese
   class << self
+    attr_accessor :environment
+
     def world
       ::Meese::World.instance
     end
@@ -27,8 +30,8 @@ module Meese
       @msg ||= Utilities::Message::Delegator.new
     end
 
-    def run!
-      ::Meese::Suite::Runner.run!
+    def run!(opts = {})
+      ::Meese::Suite::Runner.run!(opts)
     end
 
     def suite
@@ -62,6 +65,9 @@ module Meese
     def results
       @results ||= []
     end
+
+
+    # Loading configurations (serially)
 
     def configure_test_group(&block)
       @current_loading_test_group_config.configure(&block)

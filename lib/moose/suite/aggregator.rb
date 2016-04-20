@@ -18,29 +18,6 @@ module Meese
       end
 
       def test_suites
-        # begin
-        #
-        #   all_group_hash = test_group_list_yml["groups"]
-        #   group_hash = {}
-        #   if Meese.groups.any?
-        #     Meese.groups.each do |group|
-        #       if all_group_hash[group]
-        #         group_hash[group] = all_group_hash[group]
-        #       else
-        #         Meese.msg.warn("Specified group '#{group}' is not part of the defined test groups: #{all_group_hash}")
-        #       end
-        #     end
-        #   else
-        #     group_hash = all_group_hash
-        #   end
-        #   group_hash.map do |group_name, attributes|
-        #     Meese::TestGroup.new(
-        #       name: group_name,
-        #       description: attributes,
-        #       path: suite_path)
-        #   end
-        # end
-
         @test_suites ||= all_suites.map do |builder|
           builder
         end
