@@ -157,6 +157,8 @@ end
 Meese.define_test_case do |test_case|
   browser #will return the latest browser or spin up new browser with the current test suite's locators
   new_browser # spins up a new browser with the current test suite's locators
+  new_browser(:browser => :firefox) # spins up a new firefox browser with the current test suite's locators
+  new_browser(:headless => true) # spins up a headless browser
   browser(index: 0) #will return first browser
 
   run_as(OTHER_SUITE_NAME) do |suite_instance, suite_browser|
@@ -169,6 +171,7 @@ Meese.define_test_case do |test_case|
   end
 end
 ```
+
 
 ## Development
 

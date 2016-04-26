@@ -71,15 +71,15 @@ module Meese
       Meese::Harness.run_as(current_test: self, suite: suite, opts: opts, &block)
     end
 
-    def teardown
-      remove_browsers
-    end
-
     def browsers
       @browsers ||= []
     end
 
     private
+
+    def teardown
+      remove_browsers
+    end
 
     def remove_browsers
       browsers.each do |b|
