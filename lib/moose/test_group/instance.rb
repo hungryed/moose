@@ -72,7 +72,7 @@ module Meese
         ::Meese.run_test_case_with_hooks(
           test_group: self,
           test_case: test_case,
-          options: opts
+          options: options
         )
       end
 

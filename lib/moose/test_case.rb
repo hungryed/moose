@@ -38,7 +38,7 @@ module Meese
       end
     end
 
-    def new_browser(opts = {}, test_suite: test_group.test_suite)
+    def new_browser(test_suite: test_group.test_suite, **opts)
       browser_instance = Meese::Browser::Instance.new(
         test_suite: test_suite,
         browser_options: opts
@@ -50,7 +50,7 @@ module Meese
     def run!(opts={})
       self.start_time = Time.now
       begin
-        result = test_block.call(self)
+        instance_eval(&test_block)
         pass!
       rescue => e
         self.exception = e
