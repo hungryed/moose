@@ -16,37 +16,39 @@ module Meese
           try = 0
           attempts = 3
           setup_watir
-          begin
-            if Meese.config.headless || options.fetch(:headless, false)
-              @headless = Headless.new
-              @headless.start
-              @browser = chrome_browser
-            else
-              options = {
-                :resolution => [1280,800],
-                :browser => Meese.config.browser,
-              }.merge(options)
-              res = options[:resolution]
-
-              if options[:browser].to_s =~ /chrome/
+          mutex.synchronize {
+            begin
+              if Meese.config.headless || options.fetch(:headless, false)
+                @headless = Headless.new
+                @headless.start
                 @browser = chrome_browser
               else
-                @browser = Watir::Browser.new(options[:browser])
+                options = {
+                  :resolution => [1280,800],
+                  :browser => Meese.config.browser,
+                }.merge(options)
+                res = options[:resolution]
+
+                if options[:browser].to_s =~ /chrome/
+                  @browser = chrome_browser
+                else
+                  @browser = Watir::Browser.new(options[:browser])
+                end
+                @browser.window.resize_to(res[0].to_i, res[1].to_i)
               end
-              @browser.window.resize_to(res[0].to_i, res[1].to_i)
+            rescue => e
+              Meese.msg.error("Unable to create new Watir browser object, will try #{attempts - try} more times")
+              try += 1
+              if try <= attempts
+                retry
+              else
+                # back up the call stack you go
+                raise e
+              end
             end
-          rescue => e
-            Meese.msg.error("Unable to create new Watir browser object, will try #{attempts - try} more times")
-            try += 1
-            if try <= attempts
-              retry
-            else
-              # back up the call stack you go
-              raise e
-            end
-          end
-          Meese.msg.info("Created new Watir browser object! pid #{browser_pid(@browser)}")
-          @browser
+            Meese.msg.info("Created new Watir browser object! pid #{browser_pid(@browser)}")
+            @browser
+          }
         end
 
         # Given a browser object shut it down and remove it from the browser list.  Will
@@ -77,6 +79,10 @@ module Meese
         end
 
         private
+
+        def mutex
+          @mutex ||= Mutex.new
+        end
 
         def setup_watir
           @setup_watir ||= Watir.default_timeout = 180

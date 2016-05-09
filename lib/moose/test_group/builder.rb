@@ -9,7 +9,7 @@ module Meese
       end
 
       def build_list
-        Dir.glob(directory + "/*") { |test_dir|
+        Dir.glob(File.join(directory, "*")) { |test_dir|
           collection.add_test_group(test_dir)
         }
         self

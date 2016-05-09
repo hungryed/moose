@@ -9,19 +9,15 @@ module Meese
       end
 
       def build_dependencies
-        # other_directories_to_require_all = []
-        Dir.glob(directory + "/#{config.test_pattern}/*") { |test_dir|
+        Dir.glob(File.join(directory, config.test_pattern, "*")) { |test_dir|
           if test_dir =~ /locators$/
             build_locators_from(test_dir)
           elsif test_dir =~ /#{test_group_directory_pattern}/
             build_test_groups_from(test_dir)
           elsif test_dir =~ /.*_configuration\.rb/
             configuration.load_file(test_dir)
-          # else
-          #   other_directories_to_require_all << test_dir
           end
         }
-        # require_all *other_directories_to_require_all
         self
       end
 
@@ -30,15 +26,24 @@ module Meese
       end
 
       def run!(opts = {})
-        if test_group_collection
-          self.start_time = Time.now
-          # Meese.log.add_to_log("-Test Suite: #{name} started\n")
-          results << test_group_collection.run!(opts)
-          self.end_time = Time.now
-          suite_time_took = self.end_time - self.start_time
-          # Meese.log.add_to_log("-Test Suite: #{name} completed in #{suite_time_took}\n\n")
+        return self unless test_group_collection
+        self.start_time = Time.now
+        configuration.suite_hook_collection.call_hooks_with_entity(entity: self) do
+          test_group_collection.run!(opts)
         end
+        self.end_time = Time.now
         self
+      end
+
+      def rerun_failed!(opts = {})
+        return self unless test_group_collection
+        test_group_collection.rerun_failed!(opts)
+        self.end_time = Time.now
+        self
+      end
+
+      def report!(opts = {})
+        Reporter.new(self).report!(opts)
       end
 
       def name
@@ -53,11 +58,32 @@ module Meese
         configuration.base_url
       end
 
-      private
-
-      def results
-        @results ||= []
+      def filter_from_options!(options)
+        test_group_collection.filter_from_options!(options) if test_group_collection
       end
+
+      def has_available_tests?
+        test_group_collection.has_available_tests? if test_group_collection
+      end
+
+      def metadata
+        [:time_elapsed,:start_time,:end_time,:directory].inject({}) do |memo, method|
+          begin
+            memo.merge!(method => send(method))
+            memo
+          rescue => e
+            # drop error for now
+            memo
+          end
+        end
+      end
+
+      def time_elapsed
+        return unless end_time && start_time
+        end_time - start_time
+      end
+
+      private
 
       def test_group_directory_pattern
         config.moose_test_group_directory_pattern.gsub('**', '*')

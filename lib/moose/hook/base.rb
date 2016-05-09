@@ -1,15 +1,14 @@
 module Meese
   module Hook
     class Base
-      attr_reader :block, :args
+      attr_reader :block
 
-      def initialize(args: [], block:)
-        @args = args
+      def initialize(block:)
         @block = block
       end
 
-      def call_with_entity(entity, *args)
-        block.call(entity, *args)
+      def call_with_entity(entity)
+        entity.instance_eval(&block)
       end
     end
   end

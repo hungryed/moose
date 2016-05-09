@@ -3,14 +3,14 @@ module Meese
     class Configuration < Base
       include Hook::HookHelper
 
-      attr_accessor :base_path
+      attr_accessor :run_in_threads
 
       def load_file(file)
         Meese.load_test_group_config_file(file: file, configuration: self)
       end
 
       def configure(&block)
-        block.call(self)
+        self.instance_eval(&block)
       end
     end
   end

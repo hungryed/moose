@@ -29,11 +29,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "simplecov"
+  spec.add_development_dependency('pry-byebug', '2.0.0')
 
   spec.add_dependency('watir-webdriver')
   spec.add_dependency('headless')
   spec.add_dependency('colorize')
-  spec.add_dependency('faker')
-  spec.add_dependency('require_all')
-  spec.add_dependency('pry-byebug', '2.0.0')
 end

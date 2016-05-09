@@ -1,15 +1,26 @@
 module Meese
   module Hook
     class Collection
-      def call_hooks_with_entity(entity, *args, &block)
+      def call_hooks_with_entity(entity:, on_error: nil, &block)
         error_to_raise = nil
-        call_hook_set(before_hooks, entity, *args)
         begin
+          call_hook_set(before_hooks, entity)
           block.call
         rescue => e
+          if on_error
+            entity.send(on_error, e)
+          end
           error_to_raise = e
         end
-        call_hook_set(after_hooks, entity, *args)
+        begin
+          call_hook_set(after_hooks, entity)
+        rescue => e
+          if on_error && !error_to_raise
+            entity.send(on_error, e)
+          end
+          error_to_raise ||= e
+        end
+
         raise error_to_raise if error_to_raise
       end
 
@@ -23,9 +34,9 @@ module Meese
 
       private
 
-      def call_hook_set(hook_set, entity, *args)
+      def call_hook_set(hook_set, entity)
         hook_set.each do |hook|
-          hook.call_with_entity(entity, *args)
+          hook.call_with_entity(entity)
         end
       end
 

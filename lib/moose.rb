@@ -4,15 +4,18 @@ require 'colorize'
 require 'json'
 
 require "moose/version"
+require "moose/error"
+require 'moose/core'
 require "moose/assertions"
 require 'moose/hook'
 require "moose/configuration"
 require "moose/world"
-require 'moose/core'
 require 'moose/utilities'
 require 'moose/suite'
 
 module Meese
+  class NoSuiteError < Meese::Error; end
+
   class << self
     attr_accessor :environment
 
@@ -30,6 +33,10 @@ module Meese
       @msg ||= Utilities::Message::Delegator.new
     end
 
+    def require_files!
+      ::Meese::Suite::Runner.require_files!
+    end
+
     def run!(opts = {})
       ::Meese::Suite::Runner.run!(opts)
     end
@@ -44,28 +51,13 @@ module Meese
 
     def instance_for_suite(suite_name)
       suite_instance = suite.instance_for_suite(suite_name)
-      raise "No suite for #{suite_name} found" unless suite_instance
+      raise NoSuiteError.new("No suite for #{suite_name} found") unless suite_instance
       suite_instance
     end
 
     def configure(&block)
       ::Meese::Configuration.configure(&block)
     end
-
-    def run_test_case_with_hooks(test_group:, test_case:, options: {})
-      configuration.run_test_case_with_hooks(test_case) do
-        test_group.test_suite.configuration.call_hooks_with_entity(test_group.test_suite) do
-          test_group.configuration.call_hooks_with_entity(test_case) do
-            results << test_case.run!(options)
-          end
-        end
-      end
-    end
-
-    def results
-      @results ||= []
-    end
-
 
     # Loading configurations (serially)
 

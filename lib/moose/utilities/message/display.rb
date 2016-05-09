@@ -25,7 +25,7 @@ module Meese
           puts "MOOSE BARKS!"
         end
 
-        def fail
+        def failure
           with_background(:red)
         end
 
@@ -50,7 +50,7 @@ module Meese
         end
 
         def count
-          print message.yellow
+          step
           Screen.clear
         end
 
@@ -62,12 +62,7 @@ module Meese
           puts message.blue
         end
 
-        def starting
-          output = ("\n*** #{message} ***\n")
-          puts output.blue
-        end
-
-        def ending
+        def banner
           output = ("\n*** #{message} ***\n")
           puts output.blue
         end
@@ -91,7 +86,7 @@ module Meese
         end
 
         def step
-          puts message.to_s.yellow
+          puts message.yellow
         end
 
         def case_group

@@ -1,6 +1,6 @@
 module Meese
   module Assertions
-    class AssertError < StandardError; end
+    class AssertError < Meese::Error; end
 
     def compare(expected:, actual:)
       expected_value = compare_array[0]

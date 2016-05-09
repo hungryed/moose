@@ -10,13 +10,13 @@ module Meese
           instance.run!(options)
         end
 
+        def require_files!
+          instance.test_suites
+        end
+
         def instance
           @instance ||= new
         end
-      end
-
-      def results
-        @results ||= []
       end
 
       def instance_for_suite(suite_name)
@@ -31,6 +31,7 @@ module Meese
 
       def manage_snapshot_dir
         # if present, move to _prev
+        return unless configuration.snapshots
         if File.directory?(snapshot_directory)
           # remove previous _prev
           if File.directory?("#{snapshot_directory}_prev")
@@ -42,41 +43,62 @@ module Meese
       end
 
       def snapshot_directory
-        @snapshot_directory ||= configuration.current_directory + "/#{configuration.snapshot_directory}"
-      end
-
-      def initialize_run
-        manage_snapshot_dir
-        @start_time = Time.now
-        @end_time = nil
-        # Meese.log.start_log
-        # Meese.log.add_to_log("Browser: #{Meese.chosen_browser}")
-        # Meese.log.add_to_log("Base URL: #{@base_url}\n\n")
-        test_suites #want to initialize test suites before clearing the save_failure_yml...
-        # Meese.log.backup_yml_logs
-        # Meese.msg.warn(">==================> copying ./_#{Meese.current_suite.suite_name}_testlog.yml to: _prev_test_testlog.yml!!")
-        # Meese.msg.warn(">=======================> clearing ./_#{Meese.current_suite.suite_name}_testlog.yml !!")
+        @snapshot_directory ||= File.join(Meese.world.current_directory, configuration.snapshot_directory)
       end
 
       def run!(opts = {})
-        # Meese.msg.starting("#{Meese.suite_name} Start")
-        self.start_time = Time.now
-        configuration.suite_hook_collection.call_hooks_with_entity(configuration, opts) do
-          initialize_run
-          test_suites.each_with_index do |suite, i|
-            start_suite_time = Time.now
-            # Meese.log.add_to_log("-Test Case Group: #{suite.name} started\n")
-            Meese.msg.invert(":Test Group #{i+1} of #{test_suites.count}")
-            results << suite.run!(opts)
-            # results += suite.run!(:session_type => session_type, :base_url => base_url, :snapshot_dir => snapshot_directory)
-
-            suite_time_took = Time.now - start_suite_time
-            # Meese.log.add_to_log("-Test Case Group: #{suite.name} completed in #{suite_time_took}\n\n")
-          end
-          # end_test(results)
+        initialize_run
+        trim_test_suites_from(opts)
+        configuration.run_hook_collection.call_hooks_with_entity(entity: ::Meese) do
+          run_tests(opts)
         end
-        self.end_time = Time.now
+        end_run
         self
+      end
+
+    private
+
+      def initialize_run
+        Meese.msg.banner("Starting test run")
+        manage_snapshot_dir
+        self.start_time = Time.now
+        self.end_time = nil
+      end
+
+      def end_run
+        self.end_time = Time.now
+        Meese.msg.newline
+        Meese.msg.banner("total time: #{time_elapsed}")
+      end
+
+      def time_elapsed
+        return unless start_time && end_time
+        end_time - start_time
+      end
+
+      def run_tests(opts)
+        trimmed_test_suites.each_with_index do |suite, i|
+          Meese.msg.banner("Test Group #{i+1} of #{trimmed_test_suites.count}")
+          suite.run!(opts)
+          if configuration.rerun_failed
+            Meese.msg.newline
+            Meese.msg.invert("Rerunning failed tests for #{suite.name}")
+            Meese.msg.newline
+            suite.rerun_failed!(opts)
+          end
+          suite.report!
+        end
+      end
+
+      def trimmed_test_suites
+        @trimmed_test_suites ||= []
+      end
+
+      def trim_test_suites_from(opts = {})
+        test_suites.select { |test_suite|
+          test_suite.filter_from_options!(opts)
+          trimmed_test_suites << test_suite if test_suite.has_available_tests?
+        }
       end
 
       def configuration

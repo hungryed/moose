@@ -7,7 +7,7 @@ module Meese
       end
 
       def configure(&block)
-        block.call(instance)
+        instance.configure_from_block(&block)
       end
     end
 
@@ -15,6 +15,7 @@ module Meese
       :verbose => false,
       :log_directory => "",
       :snapshot_directory => "snapshots",
+      :snapshots => false,
       :moose_tests_directory => "moose_tests",
       :moose_test_group_directory_pattern => "test_groups/**",
       :suite_pattern => "*_suite/",
@@ -29,17 +30,10 @@ module Meese
 
     attr_accessor *DEFAULTS.keys
 
-    def initialize(opts={})
+    def initialize
       DEFAULTS.each do |key, value|
         self.send("#{key}=", value)
       end
-      opts.each do |key, value|
-        self.send("#{key}=", value)
-      end
-    end
-
-    def current_directory
-      @current_directory ||= Dir.pwd
     end
 
     def test_thread_count=(count)
@@ -50,20 +44,24 @@ module Meese
       @test_thread_count = count
     end
 
-    def suite_hook_collection
-      @suite_hook_collection ||= Hook::Collection.new
+    def configure_from_block(&block)
+      instance_eval(&block)
     end
 
-    def add_before_suite_hook(*args, &block)
-      create_before_hook_from(collection: suite_hook_collection, args: args, block: block)
+    def run_hook_collection
+      @run_hook_collection ||= Hook::Collection.new
     end
 
-    def add_after_suite_hook(*args, &block)
-      create_after_hook_from(collection: suite_hook_collection, args: args, block: block)
+    def add_before_run_hook(&block)
+      create_before_hook_from(collection: run_hook_collection, block: block)
     end
 
-    def run_test_case_with_hooks(test_case, *args, &block)
-      call_hooks_with_entity(test_case, *args, &block)
+    def add_after_run_hook(&block)
+      create_after_hook_from(collection: run_hook_collection, block: block)
+    end
+
+    def run_test_case_with_hooks(test_case:, on_error: nil, &block)
+      call_hooks_with_entity(entity: test_case, on_error: on_error, &block)
     end
 
     alias_method :before_each_test_case, :add_before_hook

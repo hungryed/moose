@@ -3,15 +3,6 @@ module Meese
     class Instance
       ElementTypeNotFoundError = Class.new(StandardError)
       LocatorNotValidError = Class.new(StandardError)
-      extend Forwardable
-
-      def_delegators :element, *%i(
-        present?
-        visible?
-        enabled?
-        text
-        value
-      )
       attr_accessor :selector
 
       class << self
@@ -82,16 +73,6 @@ module Meese
       def available?
         present? && visible? &&
           (respond_to?(:enabled?) && enabled?)
-      end
-
-      def element
-        # Watir includes extra methods if you use the more specific classes like TextField
-        if element_type && browser.respond_to?(element_type.to_sym)
-          elem = browser.send(element_type.to_sym, css_or_xpath_params)
-        else
-          elem = browser.element(css_or_xpath_params)
-        end
-        elem
       end
 
       def element_type

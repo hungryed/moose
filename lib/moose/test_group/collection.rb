@@ -12,25 +12,65 @@ module Meese
 
       def add_test_group(directory)
         directory_key = key_from_directory(directory)
-        cache[directory_key] ||= build_instance_from(directory)
+        cache << build_instance_from(directory)
       end
 
       def run!(opts = {})
         self.start_time = Time.now
-        cache.each do |name, test_group|
-          # Meese.log.add_to_log("-Test Case Group: #{name} started\n")
-          results << test_group.run!(opts)
-
+        filtered_cache.each do |test_group|
+          test_group.run!(opts)
         end
         self.end_time = Time.now
-        suite_time_took = self.end_time - self.start_time
-        # Meese.log.add_to_log("-Test Case Group: #{name} completed in #{suite_time_took}\n\n")
+        self
+      end
+
+      def rerun_failed!(opts = {})
+        filtered_cache.each do |test_group|
+          test_group.rerun_failed!(opts)
+        end
+        self.end_time = Time.now
+        self
+      end
+
+      def report!(opts = {})
+        filtered_cache.each do |test_group|
+          test_group.report!(opts)
+        end
+      end
+
+      def filter_from_options!(options)
+        groups = options.fetch(:groups, {})
+        include_groups = groups.fetch(:inclusion_filters, [])
+        exclude_groups = groups.fetch(:exclusion_filters, [])
+
+        cache.each do |test_group|
+          test_group.filter_from_options!(options)
+          return unless test_group
+
+          if exclude_groups.length > 0
+            return if exclude_groups.any? { |group_filter|
+              test_group.name == group_filter
+            }
+          end
+
+          if include_groups.length > 0
+            return unless include_groups.any? { |group_filter|
+              test_group.name == group_filter
+            }
+          end
+
+          filtered_cache << test_group if test_group.has_available_tests?
+        end
+      end
+
+      def has_available_tests?
+        filtered_cache.size > 0
       end
 
       private
 
-      def results
-        @results ||= []
+      def filtered_cache
+        @filtered_cache ||= []
       end
 
       def build_instance_from(directory)
@@ -57,13 +97,13 @@ module Meese
       end
 
       def read_description_yaml
-        Dir.glob(directory + "/*.yml") do |f|
+        Dir.glob(File.join(directory, "/*.yml")) do |f|
           descriptions.merge!(read_yaml_file(f))
         end
       end
 
       def cache
-        @cache ||= {}
+        @cache ||= []
       end
     end
   end

@@ -1,6 +1,7 @@
 require_relative 'harness'
 require_relative 'browser'
 require_relative 'test_status'
+require_relative 'test_case/all'
 
 module Meese
   class TestCase
@@ -34,7 +35,7 @@ module Meese
       elsif last_browser = browsers.last
         last_browser
       else
-        new_browser(options)
+        new_browser(**options)
       end
     end
 
@@ -50,14 +51,20 @@ module Meese
     def run!(opts={})
       self.start_time = Time.now
       begin
-        instance_eval(&test_block)
-        pass!
+        Meese.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
+          test_group.test_suite.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
+            test_group.configuration.call_hooks_with_entity(entity: self, on_error: :fail_with_exception) do
+              instance_eval(&test_block)
+              pass!
+            end
+          end
+        end
       rescue => e
-        self.exception = e
-        fail!
+        fail_with_exception(e)
       ensure
         teardown
         self.end_time = Time.now
+        reporter.report!
         self
       end
     end
@@ -75,7 +82,48 @@ module Meese
       @browsers ||= []
     end
 
+    def keywords
+      extra_metadata.fetch("keywords", {})
+    end
+
+    def trimmed_filepath
+      Utilities::FileUtils.trim_filename(file)
+    end
+
+    def final_report!(opts = {})
+      reporter.final_report!
+    end
+
+    def time_elapsed
+      return unless end_time && start_time
+      end_time - start_time
+    end
+
+    def metadata
+      starting_metadata = [:time_elapsed,:result,:start_time,:end_time,:file,:exception,:keywords].inject({}) do |memo, method|
+        begin
+          memo.merge!(method => send(method))
+          memo
+        rescue => e
+          # drop error for now
+          memo
+        end
+      end
+      starting_metadata.merge(extra_metadata).merge(
+        :test_group => test_group.metadata
+      )
+    end
+
     private
+
+    def fail_with_exception(err)
+      self.exception = err
+      fail!
+    end
+
+    def reporter
+      Reporter.new(self)
+    end
 
     def teardown
       remove_browsers

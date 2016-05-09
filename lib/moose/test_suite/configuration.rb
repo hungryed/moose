@@ -3,6 +3,8 @@ require 'ostruct'
 module Meese
   module TestSuite
     class Configuration < Base
+      class MissingEnvironment < Meese::Error; end
+
       include Hook::HookHelper
 
       def register_environment(environment, environment_hash)
@@ -18,13 +20,34 @@ module Meese
       end
 
       def configure(&block)
-        block.call(self)
+        self.instance_eval(&block)
       end
+
+      def suite_hook_collection
+        @suite_hook_collection ||= Hook::Collection.new
+      end
+
+      def add_before_suite_hook(&block)
+        create_before_hook_from(collection: suite_hook_collection, block: block)
+      end
+
+      def add_after_suite_hook(&block)
+        create_after_hook_from(collection: suite_hook_collection, block: block)
+      end
+
+      def run_test_case_with_hooks(test_case:, on_error: nil, &block)
+        call_hooks_with_entity(entity: test_case, on_error: on_error, &block)
+      end
+
+      alias_method :before_each_test_case, :add_before_hook
+      alias_method :after_each_test_case, :add_after_hook
 
       private
 
       def environment_object
-        environment_cache.fetch(Meese.environment) { raise "no environment setup for #{Meese.environment}" }
+        environment_cache.fetch(Meese.environment) {
+          raise MissingEnvironment.new("no environment setup for #{Meese.environment}")
+        }
       end
 
       def environment_cache

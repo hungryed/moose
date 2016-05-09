@@ -2,19 +2,25 @@ module Meese
   module Core
     class Runner
       class << self
-
         def invoke
-          ::Meese.run!(configuration_options)
+          ::Meese.require_files!
+          configure_from_options
+          trap_interrupt
+          ::Meese.run!(run_options)
         end
 
         private
 
-        def configuration_options
+        def run_options
           configuration_options_instance.moose_run_args
         end
 
+        def configure_from_options
+          configuration_options_instance.configure_from_options(::Meese.configuration)
+        end
+
         def configuration_options_instance
-          @configuration_options ||= ConfigurationOptions.new(ARGV)
+          @configuration_options_instance ||= ConfigurationOptions.new(ARGV)
         end
 
         def trap_interrupt

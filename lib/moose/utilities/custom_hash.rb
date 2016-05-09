@@ -29,7 +29,7 @@ module Meese
       end
 
       def build_deep
-        @build_deep ||= original_hash.keys.each do |key|
+        original_hash.keys.each do |key|
           raw_value = original_hash[key]
           value = case raw_value
                   when Hash

@@ -69,6 +69,14 @@ Defined in the `moose_tests` folder as `moose_configuration.rb`
 Meese.configure do |config|
 
   # HOOKS
+  config.add_before_run_hook do |moose|
+    puts "in base config before run hook"
+  end
+
+  config.add_after_run_hook do |moose|
+    puts "in base config before run hook"
+  end
+
   config.before_each_test_case do |test_case|
     puts "in base config before test case hook"
   end
@@ -82,6 +90,7 @@ Meese.configure do |config|
   #   :verbose => false,
   #   :log_directory => "",
   #   :snapshot_directory => "snapshots",
+  #   :snapshots => false,
   #   :moose_test_group_directory_pattern => "test_groups/**",
   #   :suite_pattern => "*_suite/",
   #   :test_pattern => "*_tests/",
@@ -107,6 +116,8 @@ This is where you set your base url for this test suite
 
 ```ruby
 Meese.configure_suite do |config|
+  # REGISTER ENVIRONMENTS
+
   [
     {
       :beta => {
@@ -122,6 +133,25 @@ Meese.configure_suite do |config|
     },
   ].each do |environment, environment_details|
     config.register_environment(environment, environment_details)
+  end
+
+
+  # HOOKS
+
+  config.before_each_test_case do |test_case|
+    puts "in suite before test case hook"
+  end
+
+  config.after_each_test_case do |test_case|
+    puts "in suite after test case hook"
+  end
+
+  config.add_before_suite_hook do |test_suite|
+    puts "in suite before suite hook"
+  end
+
+  config.add_after_suite_hook do |test_suite|
+    puts "in suite after suite hook"
   end
 end
 
@@ -139,6 +169,9 @@ Meese.configure_test_group do |config|
   config.add_after_hook do |test_case|
     puts "in test case after hook"
   end
+
+  #OPTIONS
+  config.run_in_threads = true # Default nil
 end
 
 ```
@@ -147,14 +180,14 @@ end
 ## Test Case
 
 ```ruby
-Meese.define_test_case do |test_case|
+Meese.define_test_case do
   # test case logic goes here
 end
 ```
 
 #### Each test case can have multiple browsers
 ```ruby
-Meese.define_test_case do |test_case|
+Meese.define_test_case do
   browser #will return the latest browser or spin up new browser with the current test suite's locators
   new_browser # spins up a new browser with the current test suite's locators
   new_browser(:browser => :firefox) # spins up a new firefox browser with the current test suite's locators
