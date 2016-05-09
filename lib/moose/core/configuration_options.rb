@@ -10,8 +10,6 @@ module Meese
 
       def initialize(args)
         @args = args
-        option_parser.parse!(args)
-        assign_environment
       end
 
       def assign_environment
@@ -21,6 +19,11 @@ module Meese
           Meese.msg.banner("No environment specified")
           raise NoEnvironmentError.new("no environment specified")
         end
+      end
+
+      def parse_args
+        option_parser.parse!(args)
+        assign_environment
       end
 
       def configure_from_options(config)

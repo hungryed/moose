@@ -3,9 +3,10 @@ module Meese
     class Runner
       class << self
         def invoke
+          trap_interrupt
+          configuration_options_instance.parse_args
           ::Meese.require_files!
           configure_from_options
-          trap_interrupt
           ::Meese.run!(run_options)
         end
 
