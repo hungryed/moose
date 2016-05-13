@@ -9,7 +9,7 @@ module Meese
       end
 
       def build_dependencies
-        Dir.glob(File.join(directory, config.test_pattern, "*")) { |test_dir|
+        Dir.glob(File.join(directory, "*")) { |test_dir|
           if test_dir =~ /locators$/
             build_locators_from(test_dir)
           elsif test_dir =~ /#{test_group_directory_pattern}/

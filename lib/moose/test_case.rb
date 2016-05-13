@@ -8,7 +8,7 @@ module Meese
     include TestStatus
 
     status_method :result
-    attr_accessor :test_block, :start_time, :end_time, :result, :exception
+    attr_accessor :test_block, :start_time, :end_time, :result, :exception, :has_run
     attr_reader :file, :extra_metadata, :test_group
 
     def initialize(file:, test_group:, extra_metadata: {})
@@ -62,6 +62,7 @@ module Meese
       rescue => e
         fail_with_exception(e)
       ensure
+        self.has_run = true
         teardown
         self.end_time = Time.now
         reporter.report!
@@ -91,6 +92,7 @@ module Meese
     end
 
     def final_report!(opts = {})
+      return unless has_run
       reporter.final_report!
     end
 

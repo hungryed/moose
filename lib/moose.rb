@@ -12,6 +12,8 @@ require "moose/configuration"
 require "moose/world"
 require 'moose/utilities'
 require 'moose/suite'
+require 'moose/helpers/all'
+require 'moose/page/all'
 
 module Meese
   class NoSuiteError < Meese::Error; end
