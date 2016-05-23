@@ -5,12 +5,12 @@ require 'json'
 
 require "moose/version"
 require "moose/error"
+require "moose/world"
+require 'moose/utilities'
 require 'moose/core'
 require "moose/assertions"
 require 'moose/hook'
 require "moose/configuration"
-require "moose/world"
-require 'moose/utilities'
 require 'moose/suite'
 require 'moose/helpers/all'
 require 'moose/page/all'

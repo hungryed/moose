@@ -4,55 +4,75 @@ require 'shellwords'
 
 module Meese
   module Core
-    module Rake
-    # Rspec rake task
+    # Moose rake task
     #
     # @see Rakefile
     class RakeTask < ::Rake::TaskLib
       include ::Rake::DSL if defined?(::Rake::DSL)
+      include ::Meese::Core::ShellEscape
 
-      # Default path to the rspec executable
-      DEFAULT_RSPEC_PATH = File.expand_path('../../../../exe/rspec', __FILE__)
+      # Default path to the moose executable
+      DEFAULT_MOOSE_PATH = File.expand_path('../../../../exe/moose', __FILE__)
 
-      # Default pattern for spec files.
-      DEFAULT_PATTERN = 'spec/**{,/*/**}/*_spec.rb'
+      # Default pattern for moose files.
+      DEFAULT_PATTERN = 'moose_tests/**{,/*/**}/*.rb'
 
-      # Name of task.
-      #
-      # default:
-      #   :spec
+
+      # Name of task. Defaults to `:moose`.
       attr_accessor :name
 
+      # Files matching this pattern will be loaded.
+      # Defaults to `'moose_tests/**{,/*/**}/*.rb'`.
+      attr_accessor :pattern
+
+      # Files matching this pattern will be excluded.
+      # Defaults to `nil`.
+      attr_accessor :exclude_pattern
+
+      # Use verbose output. If this is set to true, the task will print the
+      # executed moose command to stdout. Defaults to `true`.
+      attr_accessor :verbose
+
+      # Command line options to pass to ruby. Defaults to `nil`.
+      attr_accessor :ruby_opts
+
+      # Path to Moose. Defaults to the absolute path to the
+      # moose binary.
+      attr_accessor :moose_path
+
+      # Command line options to pass to Moose. Defaults to `nil`.
+      attr_accessor :moose_opts
+
       def initialize(*args, &task_block)
-        @name          = args.shift || :moose
-        @rspec_path    = DEFAULT_RSPEC_PATH
-        @pattern       = DEFAULT_PATTERN
+        @name               = args.shift || :moose
+        @moose_environment  = args.shift
+        @ruby_opts          = nil
+        @moose_opts         = nil
+        @verbose            = true
+        @fail_on_error      = true
+        @moose_path         = DEFAULT_MOOSE_PATH
+        @pattern            = DEFAULT_PATTERN
 
         define(args, &task_block)
       end
 
       # @private
       def run_task(verbose)
-        command = spec_command
+        command = moose_command
+        puts command if verbose
 
-        begin
-          puts command if verbose
-          success = system(command)
-        rescue
-          puts failure_message if failure_message
-        end
+        return if system(command)
 
-        return unless fail_on_error && !success
-
-        $stderr.puts "#{command} failed"
-        exit $?.exitstatus
+        return unless fail_on_error
+        $stderr.puts "#{command} failed" if verbose
+        exit $?.exitstatus || 1
       end
 
     private
 
       # @private
       def define(args, &task_block)
-        desc "Run RSpec code examples" unless ::Rake.application.last_comment
+        desc "Run Moose code examples"
 
         task name, *args do |_, task_args|
           RakeFileUtils.__send__(:verbose, verbose) do
@@ -62,47 +82,45 @@ module Meese
         end
       end
 
-      def file_inclusion_specification
-        if ENV['SPEC']
-          FileList[ ENV['SPEC']].sort
-        elsif String === pattern && !File.exist?(pattern)
-          "--pattern #{pattern.shellescape}"
-        else
-          # Before RSpec 3.1, we used `FileList` to get the list of matched files, and
-          # then pass that along to the `rspec` command. Starting with 3.1, we prefer to
-          # pass along the pattern as-is to the `rspec` command, for 3 reasons:
-          #
-          #   * It's *much* less verbose to pass one `--pattern` option than a long list of files.
-          #   * It ensures `task.pattern` and `--pattern` have the same behavior.
-          #   * It fixes a bug, where `task.pattern = pattern_that_matches_no_files` would run
-          #     *all* files because it would cause no pattern or file args to get passed to `rspec`,
-          #     which causes all files to get run.
-          #
-          # However, `FileList` is *far* more flexible than the `--pattern` option. Specifically, it
-          # supports individual files and directories, as well as arrays of files, directories and globs,
-          # as well as other `FileList` objects.
-          #
-          # For backwards compatibility, we have to fall back to using FileList if the user has passed
-          # a `pattern` option that will not work with `--pattern`.
-          #
-          # TODO: consider deprecating support for this and removing it in RSpec 4.
-          FileList[pattern].sort.map(&:shellescape)
+      def test_files
+        if files = ENV['MOOSE_TESTS']
+          FileList[files].sort
         end
       end
 
-      def file_exclusion_specification
-        " --exclude-pattern #{exclude_pattern.shellescape}" if exclude_pattern
+      def moose_tags
+        if tags = ENV["MOOSE_TAGS"]
+          "--tags=#{tags.shellescape}"
+        end
       end
 
-      def spec_command
+      def moose_groups
+        if groups = ENV["MOOSE_GROUPS"]
+          "--groups=#{groups.shellescape}"
+        end
+      end
+
+      def moose_environment
+        if moose_env = ENV["MOOSE_ENVIRONMENT"]
+          moose_env
+        elsif @moose_environment
+          @moose_environment
+        else
+          raise "No environment provided"
+        end
+      end
+
+      def moose_command
         cmd_parts = []
         cmd_parts << RUBY
         cmd_parts << ruby_opts
-        cmd_parts << rspec_load_path
-        cmd_parts << rspec_path
-        cmd_parts << file_inclusion_specification
-        cmd_parts << file_exclusion_specification
-        cmd_parts << rspec_opts
+        cmd_parts << moose_load_path
+        cmd_parts << moose_path
+        cmd_parts << moose_environment
+        cmd_parts << test_files
+        cmd_parts << moose_tags
+        cmd_parts << moose_groups
+        cmd_parts << moose_opts
         cmd_parts.flatten.reject(&blank).join(" ")
       end
 
@@ -110,10 +128,10 @@ module Meese
         lambda { |s| s.nil? || s == "" }
       end
 
-      def rspec_load_path
-        @rspec_load_path ||= begin
+      def moose_load_path
+        @moose_load_path ||= begin
           core_and_support = $LOAD_PATH.grep(
-            /#{File::SEPARATOR}rspec-(core|support)[^#{File::SEPARATOR}]*#{File::SEPARATOR}lib/
+            /#{File::SEPARATOR}moose[^#{File::SEPARATOR}]*#{File::SEPARATOR}lib/
           )
 
           "-I#{core_and_support.map(&:shellescape).join(File::PATH_SEPARATOR)}"

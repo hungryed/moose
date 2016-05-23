@@ -1,6 +1,5 @@
 require 'watir-webdriver'
 require 'headless'
-Selenium::WebDriver::Chrome::Service.executable_path = '/usr/local/bin/chromedriver'
 
 module Meese
   module Browser
