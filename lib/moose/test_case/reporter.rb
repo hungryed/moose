@@ -8,12 +8,11 @@ module Meese
       end
 
       def final_report!
+        return if test_case.passed?
         with_details do
           if test_case.failed?
             failure_script
             rerun_script
-          elsif test_case.passed?
-            passed_script
           end
         end
       end

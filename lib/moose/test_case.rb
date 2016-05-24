@@ -54,8 +54,12 @@ module Meese
         Meese.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
           test_group.test_suite.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
             test_group.configuration.call_hooks_with_entity(entity: self, on_error: :fail_with_exception) do
-              instance_eval(&test_block)
-              pass!
+              begin
+                result = instance_eval(&test_block)
+                pass_or_result!(result)
+              ensure
+                self.end_time = Time.now
+              end
             end
           end
         end

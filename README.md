@@ -93,8 +93,6 @@ Meese.configure do |config|
   #   :snapshots => false,
   #   :moose_test_group_directory_pattern => "test_groups/**",
   #   :suite_pattern => "*_suite/",
-  #   :test_pattern => "*_tests/",
-  #   :test_set_pattern => "*_set/",
   #   :run_in_threads => false,
   #   :test_thread_count => 5,
   #   :headless => false,

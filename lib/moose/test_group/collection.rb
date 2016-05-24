@@ -45,16 +45,16 @@ module Meese
 
         cache.each do |test_group|
           test_group.filter_from_options!(options)
-          return unless test_group
+          next unless test_group
 
           if exclude_groups.length > 0
-            return if exclude_groups.any? { |group_filter|
+            next if exclude_groups.any? { |group_filter|
               test_group.name == group_filter
             }
           end
 
           if include_groups.length > 0
-            return unless include_groups.any? { |group_filter|
+            next unless include_groups.any? { |group_filter|
               test_group.name == group_filter
             }
           end

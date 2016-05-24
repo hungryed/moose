@@ -68,19 +68,19 @@ module Meese
         exclude_tags = tags.fetch(:exclusion_filters, [])
         test_case_cache.each do |test_case|
           if files_to_run.length > 0
-            return unless files_to_run.any? { |file_name|
+            next unless files_to_run.any? { |file_name|
               Utilities::FileUtils.file_names_match?(file_name, test_case.file)
             }
           end
 
           if exclude_tags.length > 0
-            return if exclude_tags.any? { |tag|
+            next if exclude_tags.any? { |tag|
               test_case.keywords.include?(tag)
             }
           end
 
           if include_tags.length > 0
-            return unless include_tags.any? { |tag|
+            next unless include_tags.any? { |tag|
               test_case.keywords.include?(tag)
             }
           end

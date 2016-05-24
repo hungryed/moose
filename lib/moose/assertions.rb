@@ -1,11 +1,10 @@
 module Meese
   module Assertions
+    extend self
     class AssertError < Meese::Error; end
 
     def compare(expected:, actual:)
-      expected_value = compare_array[0]
-      actual_value = compare_array[1]
-      unless actual_value == expected_value
+      unless actual == expected
         raise AssertError, "\n|  Expected Value: #{expected}\n|    Actual Value: #{actual}"
       end
       return true

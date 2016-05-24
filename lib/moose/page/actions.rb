@@ -117,9 +117,9 @@ module Meese
       # @return [Boolean] If the element is present and enabled or not
       def wait_for_element(locator)
         wait_until do
-          locator.present? && locator.enabled?
+          is_enabled = locator.respond_to?(:enabled?) ? locator.enabled? : true
+          locator.present? && is_enabled
         end
-        true
       end
 
       def murder_dialog(opts)
