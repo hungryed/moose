@@ -2,6 +2,7 @@ module Meese
   module Page
     class Full < Base
       class NoPathGiven < Meese::Error; end
+      class MissingPathParameter < Meese::Error; end
 
       class << self
         def path=(full_path)
@@ -19,12 +20,12 @@ module Meese
       end
 
       def at_page?(opts = {})
-        _replaced_path(opts) == browser.url
+        _full_path(opts) == browser.url
       end
 
       def go_there!(opts = {})
         return if at_page?(opts)
-        go_to(_full_path)
+        go_to(_full_path(opts))
       end
 
       private
@@ -33,12 +34,31 @@ module Meese
         self.class.path
       end
 
-      def _full_path
-        File.join(browser.test_suite.base_url, _path)
+      def _full_path(opts = {})
+        File.join(browser.test_suite.base_url, _replaced_path(opts))
       end
 
       def _replaced_path(opts = {})
-        _full_path
+        current_path = _path.dup
+        _matches.each do |match|
+          current_path.gsub!(match, _fetch_key_from(opts, match))
+        end
+        current_path
+      end
+
+      def _fetch_key_from(hsh, key_name)
+        key_name = key_name.gsub(/^:/, "")
+        hsh.fetch(key_name.to_sym) {
+          hsh.fetch(key_name.to_s) { raise MissingPathParameter.new("no parameter for #{key_name}")}
+        }
+      end
+
+      def _matches
+        @_matches ||= _regex.match(_path).captures
+      end
+
+      def _regex
+        /^#{_path.gsub(/:([\w_]+)/, "(?<\\1>\[\^\\\/\]+)")}$/
       end
     end
   end
