@@ -40,12 +40,7 @@ module Moose
       end
 
       def trimmed_backtrace
-        paths = err.backtrace.take_while { |backtrace_path|
-          !(backtrace_path =~ /^#{gem_dir}\//)
-        }
-        paths.map { |path|
-          "\t#{Utilities::FileUtils.trim_filename(path)}"
-        }
+        Helpers::BacktraceHelper.new(err.backtrace).filtered_backtrace
       end
 
       def with_details(&block)

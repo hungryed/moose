@@ -1,6 +1,18 @@
 module Moose
   module Helpers
     module Waiter
+      class NeverReturned < StandardError
+        def initialize(message, full_backtrace)
+          @message = message
+          @full_backtrace = full_backtrace
+          super(@message)
+        end
+
+        def backtrace
+          BacktraceHelper.new(@full_backtrace).filtered_backtrace
+        end
+      end
+
       def wait_until(options = {}, &block)
         options[:timeout] ||= 10
 
@@ -9,7 +21,9 @@ module Moose
         begin
           until block.call
             if (Time.now - start_time) > options[:timeout]
-              raise "The block never returned: #{block.source_location}"
+              raise NeverReturned.new(
+                "The block never returned",caller_locations
+              )
             end
             sleep 0.1
           end
