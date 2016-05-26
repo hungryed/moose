@@ -1,4 +1,4 @@
-module Meese
+module Moose
   class World
     class << self
       def instance
@@ -10,6 +10,10 @@ module Meese
 
     def current_directory
       @current_directory ||= Dir.pwd
+    end
+
+    def gem_spec
+      @gem_spec ||= Gem::Specification.find_by_name("moose")
     end
   end
 end

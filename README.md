@@ -1,4 +1,4 @@
-# Meese
+# Moose
 (currently named meese to not conflict with an existing namespace)
 
 ## Installation
@@ -62,11 +62,11 @@ bundle exec moose beta
 
 ## Configurations
 
-### Meese Configuration
+### Moose Configuration
 Defined in the `moose_tests` folder as `moose_configuration.rb`
 
 ```ruby
-Meese.configure do |config|
+Moose.configure do |config|
 
   # HOOKS
   config.add_before_run_hook do |moose|
@@ -113,7 +113,7 @@ Defined in the test suite directory
 This is where you set your base url for this test suite
 
 ```ruby
-Meese.configure_suite do |config|
+Moose.configure_suite do |config|
   # REGISTER ENVIRONMENTS
 
   [
@@ -159,7 +159,7 @@ Defined in the test group directory
 This is where you can set your test group hooks for a smaller set of tests
 
 ```ruby
-Meese.configure_test_group do |config|
+Moose.configure_test_group do |config|
   config.add_before_hook do |test_case|
     puts "in test case before hook"
   end
@@ -178,14 +178,14 @@ end
 ## Test Case
 
 ```ruby
-Meese.define_test_case do
+Moose.define_test_case do
   # test case logic goes here
 end
 ```
 
 #### Each test case can have multiple browsers
 ```ruby
-Meese.define_test_case do
+Moose.define_test_case do
   browser #will return the latest browser or spin up new browser with the current test suite's locators
   new_browser # spins up a new browser with the current test suite's locators
   new_browser(:browser => :firefox) # spins up a new firefox browser with the current test suite's locators

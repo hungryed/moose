@@ -1,7 +1,7 @@
 require 'yaml'
 require 'erb'
 
-module Meese
+module Moose
   module Utilities
     class YamlFileLoader
       attr_reader :file

@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module Locator
     class Builder
       attr_reader :directory

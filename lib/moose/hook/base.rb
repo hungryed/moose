@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module Hook
     class Base
       attr_reader :block

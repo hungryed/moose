@@ -5,7 +5,7 @@ require 'moose/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "moose"
-  spec.version       = Meese::VERSION
+  spec.version       = Moose::VERSION
   spec.authors       = ["Joe Sutton"]
   spec.email         = ["hungryed6@gmail.com"]
 

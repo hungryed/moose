@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module Page
     class Section < Base
       attr_reader :element_block, :parent

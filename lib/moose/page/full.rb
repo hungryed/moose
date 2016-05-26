@@ -1,8 +1,10 @@
-module Meese
+require 'cgi'
+
+module Moose
   module Page
     class Full < Base
-      class NoPathGiven < Meese::Error; end
-      class MissingPathParameter < Meese::Error; end
+      class NoPathGiven < Moose::Error; end
+      class MissingPathParameter < Moose::Error; end
 
       class << self
         def path=(full_path)
@@ -43,6 +45,9 @@ module Meese
         _matches.each do |match|
           current_path.gsub!(match, _fetch_key_from(opts, match))
         end
+        _params_matches.each do |match|
+          current_path.gsub!(match, _fetch_key_from(opts, match))
+        end
         current_path
       end
 
@@ -54,7 +59,14 @@ module Meese
       end
 
       def _matches
-        @_matches ||= _regex.match(_path).captures
+        @_matches ||= begin
+          regex_matches = _regex.match(_path)
+          regex_matches && regex_matches.captures || []
+        end
+      end
+
+      def _params_matches
+        CGI::parse(_path).values.flatten
       end
 
       def _regex

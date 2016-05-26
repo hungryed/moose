@@ -1,6 +1,6 @@
 require_relative "aggregator"
 
-module Meese
+module Moose
   module Suite
     class Runner
       attr_accessor :start_time, :end_time
@@ -43,13 +43,13 @@ module Meese
       end
 
       def snapshot_directory
-        @snapshot_directory ||= File.join(Meese.world.current_directory, configuration.snapshot_directory)
+        @snapshot_directory ||= File.join(Moose.world.current_directory, configuration.snapshot_directory)
       end
 
       def run!(opts = {})
         initialize_run
         trim_test_suites_from(opts)
-        configuration.run_hook_collection.call_hooks_with_entity(entity: ::Meese) do
+        configuration.run_hook_collection.call_hooks_with_entity(entity: ::Moose) do
           run_tests(opts)
         end
         end_run
@@ -59,7 +59,7 @@ module Meese
     private
 
       def initialize_run
-        Meese.msg.banner("Starting test run")
+        Moose.msg.banner("Starting test run")
         manage_snapshot_dir
         self.start_time = Time.now
         self.end_time = nil
@@ -67,8 +67,8 @@ module Meese
 
       def end_run
         self.end_time = Time.now
-        Meese.msg.newline
-        Meese.msg.banner("total time: #{time_elapsed}")
+        Moose.msg.newline
+        Moose.msg.banner("total time: #{time_elapsed}")
       end
 
       def time_elapsed
@@ -78,12 +78,12 @@ module Meese
 
       def run_tests(opts)
         trimmed_test_suites.each_with_index do |suite, i|
-          Meese.msg.banner("Test Group #{i+1} of #{trimmed_test_suites.count}")
+          Moose.msg.banner("Test Group #{i+1} of #{trimmed_test_suites.count}")
           suite.run!(opts)
           if configuration.rerun_failed
-            Meese.msg.newline
-            Meese.msg.invert("Rerunning failed tests for #{suite.name}")
-            Meese.msg.newline
+            Moose.msg.newline
+            Moose.msg.invert("Rerunning failed tests for #{suite.name}")
+            Moose.msg.newline
             suite.rerun_failed!(opts)
           end
           suite.report!
@@ -102,7 +102,7 @@ module Meese
       end
 
       def configuration
-        @configuration ||= Meese.configuration
+        @configuration ||= Moose.configuration
       end
     end
   end

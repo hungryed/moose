@@ -1,8 +1,8 @@
-module Meese
+module Moose
   module TestGroup
     class Base
       def moose_config
-        Meese.configuration
+        Moose.configuration
       end
 
       def read_yaml_file(file)

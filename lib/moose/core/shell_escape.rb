@@ -1,6 +1,6 @@
 require 'shellwords'
 
-module Meese
+module Moose
   module Core
     # @private
     # Deals with the fact that `shellwords` only works on POSIX systems.

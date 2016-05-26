@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module Utilities
     class CustomHash
       attr_reader :original_hash

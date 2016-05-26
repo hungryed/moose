@@ -1,8 +1,8 @@
-module Meese
+module Moose
   module Page
     class Base
-      class ElementError < Meese::Error; end
-      class SectionError < Meese::Error; end
+      class ElementError < Moose::Error; end
+      class SectionError < Moose::Error; end
 
       include Actions
       attr_reader :browser

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Meese do
+describe Moose do
   it 'has a version number' do
-    expect(Meese::VERSION).not_to be nil
+    expect(Moose::VERSION).not_to be nil
   end
 
   it 'does something useful' do

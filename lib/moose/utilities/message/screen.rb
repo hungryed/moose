@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module Utilities
     module Message
       class Screen

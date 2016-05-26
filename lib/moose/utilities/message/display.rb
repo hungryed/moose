@@ -1,15 +1,16 @@
-module Meese
+module Moose
   module Utilities
     module Message
       class Display
-        attr_reader :message
+        attr_reader :message, :force
 
-        def initialize(message="")
+        def initialize(message="", force = false)
           @message = message.to_s
+          @force = force
         end
 
         def debug
-          if Meese.configuration.verbose
+          with_checks do
             output = message.split("\n").map{ |line| line = "DEBUG: #{line}"}.join
             puts output.swap
           end
@@ -18,91 +19,136 @@ module Meese
         alias :debug_msg :debug
 
         def standard
-          puts message
+          with_checks do
+            puts message
+          end
         end
 
         def dog
-          puts "MOOSE BARKS!"
+          with_checks do
+            puts "MOOSE BARKS!"
+          end
         end
 
         def failure
-          with_background(:red)
+          with_checks do
+            with_background(:red)
+          end
         end
 
         def error
-          puts message.red
+          with_checks do
+            puts message.red
+          end
         end
 
         def pass
-          with_background(:green)
+          with_checks do
+            with_background(:green)
+          end
         end
 
         def pending
-          with_background(:magenta)
+          with_checks do
+            with_background(:magenta)
+          end
         end
 
         def skipped
-          with_background(:orange)
+          with_checks do
+            with_background(:orange)
+          end
         end
 
         def warn
-          puts message.yellow
+          with_checks do
+            puts message.yellow
+          end
         end
 
         def count
-          step
+          with_checks do
+            step
+          end
           Screen.clear
         end
 
         def incomplete
-          with_background(:yellow)
+          with_checks do
+            with_background(:yellow)
+          end
         end
 
         def info
-          puts message.blue
+          with_checks do
+            puts message.blue
+          end
         end
 
         def banner
-          output = ("\n*** #{message} ***\n")
-          puts output.blue
+          with_checks do
+            output = ("\n*** #{message} ***\n")
+            puts output.blue
+          end
         end
 
         def header
-          output = "\n[#{message}]\n"
-          puts output.cyan
+          with_checks do
+            output = "\n[#{message}]\n"
+            puts output.cyan
+          end
         end
 
         def invert
-          with_background(:black)
+          with_checks do
+            with_background(:black)
+          end
         end
 
         def case_description
-          output = "\n[#{message}]"
-          puts output.cyan
+          with_checks do
+            output = "\n[#{message}]"
+            puts output.cyan
+          end
         end
 
         def name
-          with_background(:cyan)
+          with_checks do
+            with_background(:cyan)
+          end
         end
 
         def step
-          puts message.yellow
+          with_checks do
+            puts message.yellow
+          end
         end
 
         def case_group
-          newline
-          puts message
+          with_checks do
+            newline
+            puts message
+          end
         end
 
         def newline
-          puts
+          with_checks do
+            puts
+          end
         end
 
         def dot
-          print '.'.yellow
+          with_checks do
+            print '.'.yellow
+          end
         end
 
         private
+
+        def with_checks(&block)
+          return unless Moose.configuration.verbose || force
+          block.call
+        end
 
         def with_background(background_color)
           puts message.colorize(:color => :white, :background => background_color.to_sym)

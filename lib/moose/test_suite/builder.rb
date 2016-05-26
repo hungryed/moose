@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module TestSuite
     class Builder < Base
       attr_reader :directory

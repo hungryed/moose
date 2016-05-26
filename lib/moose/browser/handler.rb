@@ -1,7 +1,7 @@
 require 'watir-webdriver'
 require 'headless'
 
-module Meese
+module Moose
   module Browser
     class Handler
       # Create a new browser instance and add to list of known browsers.
@@ -17,14 +17,14 @@ module Meese
           setup_watir
           mutex.synchronize {
             begin
-              if Meese.config.headless || options.fetch(:headless, false)
+              if Moose.config.headless || options.fetch(:headless, false)
                 @headless = Headless.new
                 @headless.start
                 @browser = chrome_browser
               else
                 options = {
                   :resolution => [1280,800],
-                  :browser => Meese.config.browser,
+                  :browser => Moose.config.browser,
                 }.merge(options)
                 res = options[:resolution]
 
@@ -36,7 +36,7 @@ module Meese
                 @browser.window.resize_to(res[0].to_i, res[1].to_i)
               end
             rescue => e
-              Meese.msg.error("Unable to create new Watir browser object, will try #{attempts - try} more times")
+              Moose.msg.error("Unable to create new Watir browser object, will try #{attempts - try} more times")
               try += 1
               if try <= attempts
                 retry
@@ -45,7 +45,7 @@ module Meese
                 raise e
               end
             end
-            Meese.msg.info("Created new Watir browser object! pid #{browser_pid(@browser)}")
+            Moose.msg.info("Created new Watir browser object! pid #{browser_pid(@browser)}")
             @browser
           }
         end
@@ -57,23 +57,23 @@ module Meese
         def close_browser b
           begin
             pid = browser_pid(b)
-            Meese.msg.info("Closing Watir browser! pid #{pid}")
+            Moose.msg.info("Closing Watir browser! pid #{pid}")
             if b.exists?
               b.close
             end
           rescue => e
-            Meese.msg.error("Unable to close browser using Watir browser.close! - #{e.message}")
-            Meese.msg.info("Going to kill pid #{pid}")
+            Moose.msg.error("Unable to close browser using Watir browser.close! - #{e.message}")
+            Moose.msg.info("Going to kill pid #{pid}")
             begin
               ::Process.kill('KILL', pid)
             rescue => e
-              Meese.msg.error("Unable to kill browser using Process.kill!")
-              Meese.report_error(e)
+              Moose.msg.error("Unable to kill browser using Process.kill!")
+              raise
             else
-              Meese.msg.info("Killed browser! pid #{pid}")
+              Moose.msg.info("Killed browser! pid #{pid}")
             end
           else
-            Meese.msg.info("Closed browser! pid #{pid}")
+            Moose.msg.info("Closed browser! pid #{pid}")
           end
         end
 

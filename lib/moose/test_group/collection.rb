@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module TestGroup
     class Collection < Base
       attr_accessor :start_time, :end_time

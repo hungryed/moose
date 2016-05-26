@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module Locator
     class Instance
       ElementTypeNotFoundError = Class.new(StandardError)
@@ -15,7 +15,7 @@ module Meese
               begin
                 return by_locator(value)
               rescue ElementTypeNotFoundError, LocatorNotValidError => e
-                Meese.msg.debug("Invalid element found: #{value}")
+                Moose.msg.debug("Invalid element found: #{value}")
               end
             end
           end

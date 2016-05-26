@@ -1,6 +1,6 @@
 require 'thread'
 
-module Meese
+module Moose
   module TestGroup
     class Instance < Base
       attr_accessor :start_time, :end_time
@@ -154,7 +154,7 @@ module Meese
       end
 
       def run_test_case(test_case:, options: {})
-        return if Meese.world.wants_to_quit
+        return if Moose.world.wants_to_quit
         test_case.run!(options)
       end
 

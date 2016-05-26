@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module TestGroup
     class Builder < Base
       attr_reader :directory, :locator_list, :test_group, :test_suite

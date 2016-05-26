@@ -1,9 +1,9 @@
 require 'ostruct'
 
-module Meese
+module Moose
   module TestSuite
     class Configuration < Base
-      class MissingEnvironment < Meese::Error; end
+      class MissingEnvironment < Moose::Error; end
 
       include Hook::HookHelper
 
@@ -16,7 +16,7 @@ module Meese
       end
 
       def load_file(file)
-        Meese.load_suite_config_file(file: file, configuration: self)
+        Moose.load_suite_config_file(file: file, configuration: self)
       end
 
       def configure(&block)
@@ -45,8 +45,8 @@ module Meese
       private
 
       def environment_object
-        environment_cache.fetch(Meese.environment) {
-          raise MissingEnvironment.new("no environment setup for #{Meese.environment}")
+        environment_cache.fetch(Moose.environment) {
+          raise MissingEnvironment.new("no environment setup for #{Moose.environment}")
         }
       end
 

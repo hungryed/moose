@@ -1,8 +1,8 @@
-module Meese
+module Moose
   module Utilities
     class FileUtils
       class << self
-        def trim_filename(filename, removal_path = Meese.world.current_directory)
+        def trim_filename(filename, removal_path = Moose.world.current_directory)
           filename.gsub(/^#{removal_path}/, ".")
         end
 

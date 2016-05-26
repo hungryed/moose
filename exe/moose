@@ -2,4 +2,4 @@
 
 require "moose"
 
-Meese::Core::Runner.invoke
+Moose::Core::Runner.invoke

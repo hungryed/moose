@@ -1,10 +1,10 @@
-module Meese
+module Moose
   module Utilities
     module Message
       class Delegator
-        def report_array(message_type, array)
+        def report_array(message_type, array, force=false)
           array.each do |element|
-            call_on_message(message_type, element)
+            call_on_message(message_type, element, force)
           end
         end
 

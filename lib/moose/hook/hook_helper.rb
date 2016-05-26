@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module Hook
     module HookHelper
       def add_before_hook(&block)

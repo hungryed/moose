@@ -1,11 +1,15 @@
-module Meese
+module Moose
   module Assertions
     extend self
-    class AssertError < Meese::Error; end
+    class AssertError < Moose::Error; end
 
-    def compare(expected:, actual:)
+    def default_compare_message(expected, actual)
+      "\n|  Expected Value: #{expected}\n|    Actual Value: #{actual}"
+    end
+
+    def compare(expected:, actual:, message: default_compare_message(expected, actual))
       unless actual == expected
-        raise AssertError, "\n|  Expected Value: #{expected}\n|    Actual Value: #{actual}"
+        raise AssertError, message
       end
       return true
     end

@@ -3,7 +3,7 @@ require_relative 'browser'
 require_relative 'test_status'
 require_relative 'test_case/all'
 
-module Meese
+module Moose
   class TestCase
     include TestStatus
 
@@ -18,7 +18,7 @@ module Meese
     end
 
     def build
-      Meese.load_test_case_from_file(file: file, test_case: self)
+      Moose.load_test_case_from_file(file: file, test_case: self)
     end
 
     def locators
@@ -40,8 +40,9 @@ module Meese
     end
 
     def new_browser(test_suite: test_group.test_suite, **opts)
-      browser_instance = Meese::Browser::Instance.new(
+      browser_instance = Moose::Browser::Instance.new(
         test_suite: test_suite,
+        test_case: self,
         browser_options: opts
       )
       browsers << browser_instance
@@ -51,7 +52,7 @@ module Meese
     def run!(opts={})
       self.start_time = Time.now
       begin
-        Meese.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
+        Moose.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
           test_group.test_suite.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
             test_group.configuration.call_hooks_with_entity(entity: self, on_error: :fail_with_exception) do
               begin
@@ -80,7 +81,7 @@ module Meese
     end
 
     def run_as(suite, opts={}, &block)
-      Meese::Harness.run_as(current_test: self, suite: suite, opts: opts, &block)
+      Moose::Harness.run_as(current_test: self, suite: suite, opts: opts, &block)
     end
 
     def browsers
@@ -118,6 +119,10 @@ module Meese
       starting_metadata.merge(extra_metadata).merge(
         :test_group => test_group.metadata
       )
+    end
+
+    def inspect
+      '#<%s:0x%x file=%s>' % [self.class, hash*2, file]
     end
 
     private

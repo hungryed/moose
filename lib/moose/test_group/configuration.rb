@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module TestGroup
     class Configuration < Base
       include Hook::HookHelper
@@ -6,7 +6,7 @@ module Meese
       attr_accessor :run_in_threads
 
       def load_file(file)
-        Meese.load_test_group_config_file(file: file, configuration: self)
+        Moose.load_test_group_config_file(file: file, configuration: self)
       end
 
       def configure(&block)

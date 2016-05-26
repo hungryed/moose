@@ -2,14 +2,14 @@ require 'rake'
 require 'rake/tasklib'
 require 'shellwords'
 
-module Meese
+module Moose
   module Core
     # Moose rake task
     #
     # @see Rakefile
     class RakeTask < ::Rake::TaskLib
       include ::Rake::DSL if defined?(::Rake::DSL)
-      include ::Meese::Core::ShellEscape
+      include ::Moose::Core::ShellEscape
 
       # Default path to the moose executable
       DEFAULT_MOOSE_PATH = File.expand_path('../../../../exe/moose', __FILE__)

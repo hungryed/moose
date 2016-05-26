@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module TestSuite
     class Instance < Base
       attr_accessor :start_time, :end_time
@@ -22,7 +22,7 @@ module Meese
       end
 
       def configuration
-        @configuration ||= ::Meese::TestSuite::Configuration.new
+        @configuration ||= ::Moose::TestSuite::Configuration.new
       end
 
       def run!(opts = {})

@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module TestStatus
     def self.included(klass)
       klass.extend(ClassMethods)

@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module TestSuite
     class Reporter < Base
       attr_reader :test_suite_instance
@@ -8,9 +8,9 @@ module Meese
       end
 
       def report!(options = {})
-        Meese.msg.info("#{test_suite_instance.name}:")
-        Meese.msg.info("  time: #{time_suite_took} seconds")
-        Meese.msg.newline
+        Moose.msg.info("#{test_suite_instance.name}:", true)
+        Moose.msg.info("  time: #{time_suite_took} seconds", true)
+        Moose.msg.newline("", true)
         test_suite_instance.test_group_collection.report!
       end
 

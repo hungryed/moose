@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module Helpers
     module Waiter
       def wait_until(options = {}, &block)

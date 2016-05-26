@@ -1,6 +1,6 @@
 require_relative "../test_suite"
 
-module Meese
+module Moose
   module Suite
     class Aggregator
       class << self
@@ -40,11 +40,11 @@ module Meese
       end
 
       def moose_tests_directory
-        @moose_tests_directory ||= File.join(Meese.world.current_directory, config.moose_tests_directory)
+        @moose_tests_directory ||= File.join(Moose.world.current_directory, config.moose_tests_directory)
       end
 
       def config
-        @config ||= Meese.configuration
+        @config ||= Moose.configuration
       end
     end
   end

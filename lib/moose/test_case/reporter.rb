@@ -1,4 +1,4 @@
-module Meese
+module Moose
   class TestCase
     class Reporter
       attr_reader :test_case
@@ -30,7 +30,7 @@ module Meese
       def rerun_script
         newline
         message_with(:info, "To Rerun")
-        message_with(:info, "bundle exec moose #{test_case.trimmed_filepath}")
+        message_with(:info, "bundle exec moose #{Moose.environment} #{test_case.trimmed_filepath}")
       end
 
       private
@@ -41,7 +41,7 @@ module Meese
 
       def trimmed_backtrace
         paths = err.backtrace.take_while { |backtrace_path|
-          !(backtrace_path =~ /^#{gem_spec.gem_dir}\//)
+          !(backtrace_path =~ /^#{gem_dir}\//)
         }
         paths.map { |path|
           "\t#{Utilities::FileUtils.trim_filename(path)}"
@@ -64,7 +64,7 @@ module Meese
         if err
           message_with(:error, err.class)
           message_with(:error, err.message)
-          Meese.msg.report_array(:error, trimmed_backtrace)
+          Moose.msg.report_array(:error, trimmed_backtrace, true)
         end
       end
 
@@ -73,15 +73,19 @@ module Meese
       end
 
       def newline
-        Meese.msg.newline
+        Moose.msg.newline("", true)
       end
 
       def message_with(type, message)
-        Meese.msg.send(type, "\t#{message}")
+        Moose.msg.send(type, "\t#{message}", true)
+      end
+
+      def gem_dir
+        @gem_dir ||= gem_spec.gem_dir
       end
 
       def gem_spec
-        Gem::Specification.find_by_name("moose")
+        @gem_spec ||= Moose.world.gem_spec
       end
     end
   end

@@ -1,10 +1,11 @@
-module Meese
+module Moose
   module Browser
     class Instance
-      attr_reader :test_suite, :browser_options
+      attr_reader :test_suite, :test_case, :browser_options
 
-      def initialize(test_suite:, browser_options: {})
+      def initialize(test_suite:, test_case: ,browser_options: {})
         @test_suite = test_suite
+        @test_case = test_case
         @browser_options = browser_options
         @closed = false
         watir_browser
@@ -16,7 +17,7 @@ module Meese
 
       def close!
         unless @closed
-          Meese::Browser::Handler.close_browser(watir_browser)
+          Moose::Browser::Handler.close_browser(watir_browser)
           @closed = true
         end
       end
@@ -54,9 +55,9 @@ module Meese
         begin
           file_path = File.join(snapshot_path, "#{name}.png")
           browser.screenshot.save(file_path)
-          Meese.msg.info("\tSNAPSHOT TAKEN: #{file_path}\n")
+          Moose.msg.info("\tSNAPSHOT TAKEN: #{file_path}\n")
         rescue => e
-          Meese.msg.error("\t*** UNABLE TO TAKE SNAPSHOT ***")
+          Moose.msg.error("\t*** UNABLE TO TAKE SNAPSHOT ***")
           raise
         end
       end
@@ -74,7 +75,7 @@ module Meese
       end
 
       def snapshot_path
-        @snapshot_path ||= File.join(Meese.world.current_directory, Meese.config.snapshot_directory, test_suite.name)
+        @snapshot_path ||= File.join(Moose.world.current_directory, Moose.config.snapshot_directory, test_suite.name)
       end
     end
   end

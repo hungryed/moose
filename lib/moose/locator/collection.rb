@@ -1,10 +1,10 @@
 require 'yaml'
 require 'erb'
 
-module Meese
+module Moose
   module Locator
-    class NoLocatorSet < Meese::Error; end
-    class NoLocator < Meese::Error; end
+    class NoLocatorSet < Moose::Error; end
+    class NoLocator < Moose::Error; end
 
     class Collection
       def add_locators_from_file(file)

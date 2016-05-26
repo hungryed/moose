@@ -1,4 +1,3 @@
-require 'require_all'
 require 'watir-webdriver'
 require 'colorize'
 require 'json'
@@ -15,18 +14,18 @@ require 'moose/suite'
 require 'moose/helpers/all'
 require 'moose/page/all'
 
-module Meese
-  class NoSuiteError < Meese::Error; end
+module Moose
+  class NoSuiteError < Moose::Error; end
 
   class << self
     attr_accessor :environment
 
     def world
-      ::Meese::World.instance
+      ::Moose::World.instance
     end
 
     def configuration
-      ::Meese::Configuration.instance
+      ::Moose::Configuration.instance
     end
 
     alias_method :config, :configuration
@@ -36,11 +35,11 @@ module Meese
     end
 
     def require_files!
-      ::Meese::Suite::Runner.require_files!
+      ::Moose::Suite::Runner.require_files!
     end
 
     def run!(opts = {})
-      ::Meese::Suite::Runner.run!(opts)
+      ::Moose::Suite::Runner.run!(opts)
     end
 
     def suite
@@ -58,7 +57,7 @@ module Meese
     end
 
     def configure(&block)
-      ::Meese::Configuration.configure(&block)
+      ::Moose::Configuration.configure(&block)
     end
 
     # Loading configurations (serially)

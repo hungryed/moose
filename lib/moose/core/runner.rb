@@ -1,13 +1,13 @@
-module Meese
+module Moose
   module Core
     class Runner
       class << self
         def invoke
           trap_interrupt
           configuration_options_instance.parse_args
-          ::Meese.require_files!
+          ::Moose.require_files!
           configure_from_options
-          ::Meese.run!(run_options)
+          ::Moose.run!(run_options)
         end
 
         private
@@ -17,7 +17,7 @@ module Meese
         end
 
         def configure_from_options
-          configuration_options_instance.configure_from_options(::Meese.configuration)
+          configuration_options_instance.configure_from_options(::Moose.configuration)
         end
 
         def configuration_options_instance
@@ -26,8 +26,8 @@ module Meese
 
         def trap_interrupt
           trap('INT') do
-            exit!(1) if Meese.world.wants_to_quit
-            Meese.world.wants_to_quit = true
+            exit!(1) if Moose.world.wants_to_quit
+            Moose.world.wants_to_quit = true
             STDERR.puts "\nExiting... Interrupt again to exit immediately."
           end
         end

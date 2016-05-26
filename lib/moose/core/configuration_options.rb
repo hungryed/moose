@@ -1,10 +1,10 @@
 require 'optparse'
 require 'ostruct'
 
-module Meese
+module Moose
   module Core
     class ConfigurationOptions
-      class NoEnvironmentError < Meese::Error; end
+      class NoEnvironmentError < Moose::Error; end
       RUN_OPTIONS = [:tags, :groups, :run_in_threads]
       attr_reader :args
 
@@ -14,9 +14,9 @@ module Meese
 
       def assign_environment
         if environment = args.shift
-          Meese.environment = environment.to_sym
+          Moose.environment = environment.to_sym
         else
-          Meese.msg.banner("No environment specified")
+          Moose.msg.banner("No environment specified")
           raise NoEnvironmentError.new("no environment specified")
         end
       end
@@ -27,7 +27,7 @@ module Meese
       end
 
       def configure_from_options(config)
-        select_keys_at(*::Meese::Configuration::DEFAULTS.keys).each do |key, value|
+        select_keys_at(*::Moose::Configuration::DEFAULTS.keys).each do |key, value|
           config.send("#{key}=", value)
         end
       end

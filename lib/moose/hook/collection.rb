@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module Hook
     class Collection
       def call_hooks_with_entity(entity:, on_error: nil, &block)

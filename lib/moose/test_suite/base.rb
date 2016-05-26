@@ -1,10 +1,10 @@
 require_relative "../test_group"
 
-module Meese
+module Moose
   module TestSuite
     class Base
       def config
-        Meese.configuration
+        Moose.configuration
       end
     end
   end

@@ -1,4 +1,4 @@
-module Meese
+module Moose
   class Configuration
     include Hook::HookHelper
     class << self

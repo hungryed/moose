@@ -1,4 +1,4 @@
-module Meese
+module Moose
   module Page
     module Actions
       include Helpers::Waiter
@@ -8,7 +8,8 @@ module Meese
       # @param [String] value The value to set
       def fill_text(locator, value)
         wait_for_element(locator)
-        locator.set(value)
+        meth = locator.respond_to?(:set) ? :set : :send_keys
+        locator.send(meth, value)
       end
 
       # Given a set of date fields (year, month, day) set to a X number of days ago
@@ -117,8 +118,7 @@ module Meese
       # @return [Boolean] If the element is present and enabled or not
       def wait_for_element(locator)
         wait_until do
-          is_enabled = locator.respond_to?(:enabled?) ? locator.enabled? : true
-          locator.present? && is_enabled
+          locator.present? && locator_is_enabled?(locator)
         end
       end
 
@@ -127,7 +127,18 @@ module Meese
         browser.execute_script("window.confirm = function() {return #{opts.to_s}}")
       end
 
+      def click_modal_element(locator)
+        wait_until do
+          locator.wd.location.y == locator.wd.location.y && locator_is_enabled?(locator)
+        end
+        click_on(locator)
+      end
+
       private
+
+      def locator_is_enabled?(locator)
+        locator.respond_to?(:enabled?) ? locator.enabled? : true
+      end
 
       # Write a message saying that whatever we were looking for wasn't found
       # @param [Watir::Element] locator The element that we failed to find
