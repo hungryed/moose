@@ -33,12 +33,12 @@ To specify a particular directory of tests to run, execute:
 bundle exec moose beta moose_tests/path/to/test_suite/
 ```
 
-To get more specific, you can specify a single test group to execute:
+To get more specific, you can target a single test group to execute:
 ```bash
 bundle exec moose beta moose_tests/path/to/test_suite/and/test_group/
 ```
 
-To use the most granular option, you can specify a single test case to execute:
+To use the most granular option, you can target a single test case to execute:
 ```bash
 bundle exec moose beta moose_tests/path/to/test_suite/and/test_group/specific_test_case.rb
 ```
