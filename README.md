@@ -231,3 +231,9 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
+## Potato
+
+![](https://upload.wikimedia.org/wikipedia/commons/4/47/Russet_potato_cultivar_with_sprouts.jpg)
+
+Special thanks to @kiisu-dsalyss for being the Virgin Mooseherder.
+
