@@ -13,7 +13,7 @@ module Moose
       class << self
         def new_browser(options = {})
           try = 0
-          attempts = 3
+          attempts = options.fetch(:attempts, 3)
           setup_watir
           mutex.synchronize {
             begin
@@ -36,9 +36,10 @@ module Moose
                 @browser.window.resize_to(res[0].to_i, res[1].to_i)
               end
             rescue => e
-              Moose.msg.error("Unable to create new Watir browser object, will try #{attempts - try} more times")
               try += 1
               if try <= attempts
+                Moose.msg.error("Unable to create new Watir browser object, will try #{attempts - try - 1} more times")
+                close_browser(@browser) if @browser
                 retry
               else
                 # back up the call stack you go
@@ -66,7 +67,7 @@ module Moose
             Moose.msg.info("Going to kill pid #{pid}")
             begin
               ::Process.kill('KILL', pid)
-            rescue => e
+            rescue Errno::ESRCH => e
               Moose.msg.error("Unable to kill browser using Process.kill!")
               raise
             else
