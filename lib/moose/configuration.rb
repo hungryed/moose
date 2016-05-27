@@ -13,7 +13,6 @@ module Moose
 
     DEFAULTS = {
       :verbose => false,
-      :log_directory => "",
       :snapshot_directory => "snapshots",
       :snapshots => false,
       :moose_tests_directory => "moose_tests",
