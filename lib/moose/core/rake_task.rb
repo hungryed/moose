@@ -28,6 +28,7 @@ module Moose
       # Files matching this pattern will be excluded.
       # Defaults to `nil`.
       attr_accessor :exclude_pattern
+      attr_accessor :fail_on_error
 
       # Use verbose output. If this is set to true, the task will print the
       # executed moose command to stdout. Defaults to `true`.
