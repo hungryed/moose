@@ -27,7 +27,23 @@ For example:
 bundle exec moose beta
 ```
 
-## Directory Structure
+To specify a particular directory of tests to run, execute:
+
+```bash
+bundle exec moose beta moose_tests/path/to/test_suite/
+```
+
+To get more specific, you can specify a single test group to execute:
+```bash
+bundle exec moose beta moose_tests/path/to/test_suite/and/test_group/
+```
+
+To use the most granular option, you can specify a single test case to execute:
+```bash
+bundle exec moose beta moose_tests/path/to/test_suite/and/test_group/specific_test_case.rb
+```
+
+## Generic Directory Structure
 ```
 |--app
 |--spec
@@ -101,6 +117,14 @@ Moose.configure do |config|
   config.test_thread_count = 5
 end
 
+```
+
+Under the above implemention, to designate a global config option you would need to add a `config.SPECIFY_DESIRED_OPTION` line in the moose_configuration.rb file--but this necessarily affects every test you run, which may be an undesirable outcome. To run options on an as-needed basis, specify them in the command line. You can run `moose --help` to see the available configuration options.
+
+For example:
+
+```bash
+bundle exec moose --headless
 ```
 
 
