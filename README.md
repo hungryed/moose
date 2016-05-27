@@ -85,7 +85,6 @@ Moose.configure do |config|
   # OPTIONS
   # DEFAULTS = {
   #   :verbose => false,
-  #   :log_directory => "",
   #   :snapshot_directory => "snapshots",
   #   :snapshots => false,
   #   :moose_test_group_directory_pattern => "test_groups/**",
@@ -106,7 +105,7 @@ end
 
 
 ### Test Suite Configuration
-This config is located in the `#{app}_suite` directory for each individual suite. The base URL to execute tests in specific environments (e.g. beta, staging) is defined here, as well as API tokens and any hooks you want to be run before or after the test suite is executed.
+This config is located in the `#{app}_suite` directory for each individual suite. The base URLs to execute tests in specific environments (e.g. beta, staging) are defined here, as well as API tokens and any hooks you want to be run before or after the test suite is executed.
 
 ```ruby
 Moose.configure_suite do |config|
