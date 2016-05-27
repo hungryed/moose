@@ -1,9 +1,6 @@
-# Moose
-(currently named meese to not conflict with an existing namespace)
+# Moose: The Facts And The Myths
 
-## Installation
-
-Add this line to your application's Gemfile:
+Add the Moose gem to your application's Gemfile:
 
 ```ruby
 gem 'moose'
@@ -19,51 +16,51 @@ Or install it yourself as:
 
 ## Usage
 
+In order to run the entire directory of Moose tests (e.g. all included test suites), execute:
+
 ```bash
 bundle exec moose {ENVIRONMENT_NAME}
 ```
 
-for example
+For example:
 ```bash
 bundle exec moose beta
 ```
 
-## Directory structure
+## Directory Structure
 ```
 |--app
 |--spec
 |--moose_tests
-  |--app_one_suite
-  | |--app_one_tests
-  | | |--lib
-  | | |--locators
-  | | | |--creative_directory_locators
-  | | | | |--creative_locators.yml
-  | | | | |--better_creative_locators.yml
-  | | | |--some_locators.yml
-  | | |--test_groups
-  | | | |--creative_directory_name
-  | | | | |--test_cases
-  | | | | | |--test_case_definition.rb
-  | | | | | |--another_test_case_definition.rb
-  | | | | |--creative_directory_configuration.rb
-  | | | |--another_very_creative_directory_name
-  | | | | |--test_cases
-  | | | | | |--hey_look_a_test.rb
-  | | | | | |--oh_man_a_test.rb
-  | | | |--app_one_tests_configuration.rb
-  |--other_app_suite
-  | |--other_app_tests
-  |   |--lib
-  |   |--locators
-  |   |--test_groups
-  |--moose_configuration.rb
+| |--app_one_suite
+| | |--lib
+| | |--locators
+| | | |--creative_directory_locators
+| | | | |--creative_locators.yml
+| | | | |--better_creative_locators.yml
+| | | |--some_locators.yml
+| | |--test_groups
+| | | |--creative_directory_name
+| | | | |--test_cases
+| | | | | |--test_case_definition.rb
+| | | | | |--another_test_case_definition.rb
+| | | | |--creative_directory_configuration.rb
+| | | |--another_very_creative_directory_name
+| | | | |--test_cases
+| | | | | |--hey_look_a_test.rb
+| | | | | |--oh_man_a_test.rb
+| | | |--app_one_tests_configuration.rb
+| |--other_app_suite
+| | |--lib
+| | |--locators
+| | |--test_groups
+| |--moose_configuration.rb
 ```
 
 ## Configurations
 
 ### Moose Configuration
-Defined in the `moose_tests` folder as `moose_configuration.rb`
+Defined in the `moose_tests` folder as `moose_configuration.rb`.
 
 ```ruby
 Moose.configure do |config|
@@ -109,8 +106,7 @@ end
 
 
 ### Test Suite Configuration
-Defined in the test suite directory
-This is where you set your base url for this test suite
+This config is located in the `#{app}_suite` directory for each individual suite. The base URL to execute tests in specific environments (e.g. beta, staging) is defined here, as well as API tokens and any hooks you want to be run before or after the test suite is executed.
 
 ```ruby
 Moose.configure_suite do |config|
@@ -152,11 +148,10 @@ Moose.configure_suite do |config|
     puts "in suite after suite hook"
   end
 end
-
 ```
+
 ### Test Group Configuration
-Defined in the test group directory
-This is where you can set your test group hooks for a smaller set of tests
+The config file for test groups is defined in the `#{app}_group` directory. This is where you can set hooks for a single group of tests, as opposed to a global hook run before or after the entire suite.
 
 ```ruby
 Moose.configure_test_group do |config|
@@ -174,8 +169,7 @@ end
 
 ```
 
-
-## Test Case
+### Test Case Setup
 
 ```ruby
 Moose.define_test_case do
@@ -183,14 +177,14 @@ Moose.define_test_case do
 end
 ```
 
-#### Each test case can have multiple browsers
+#### Fun Fact: An individual test case can have multiple browsers!
 ```ruby
 Moose.define_test_case do
-  browser #will return the latest browser or spin up new browser with the current test suite's locators
+  browser # will return the latest browser or spin up new browser with the current test suite's locators
   new_browser # spins up a new browser with the current test suite's locators
   new_browser(:browser => :firefox) # spins up a new firefox browser with the current test suite's locators
   new_browser(:headless => true) # spins up a headless browser
-  browser(index: 0) #will return first browser
+  browser(index: 0) # will return first browser
 
   run_as(OTHER_SUITE_NAME) do |suite_instance, suite_browser|
 
@@ -202,7 +196,6 @@ Moose.define_test_case do
   end
 end
 ```
-
 
 ## Development
 
