@@ -71,7 +71,7 @@ module Moose
             parsed_args.browser = browser.to_sym
           end
 
-          parser.on("-h", "--headless", "run headless") do |headless|
+          parser.on("-h", "--[no-]headless", "run headless") do |headless|
             parsed_args.headless = headless
           end
 
