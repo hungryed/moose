@@ -110,6 +110,7 @@ Moose.configure do |config|
   #   :headless => false,
   #   :browser => :chrome,
   #   :rerun_failed => false,
+  #   :show_full_error_backtrace => false,
   # }
 
   config.verbose = true

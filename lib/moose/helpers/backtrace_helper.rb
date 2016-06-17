@@ -14,9 +14,13 @@ module Moose
       end
 
       def paths
-        start_of_trace.take_while { |backtrace_path|
-          !(backtrace_path.to_s =~ /^#{gem_dir}\//)
-        }
+        if configuration.show_full_error_backtrace
+          backtrace.map(&:to_s)
+        else
+          start_of_trace.take_while { |backtrace_path|
+            !(backtrace_path.to_s =~ /^#{gem_dir}\//)
+          }
+        end
       end
 
       def start_of_trace
@@ -24,6 +28,10 @@ module Moose
           !(backtrace_path.to_s =~ /^#{gem_dir}\//)
         }
         backtrace[i..-1]
+      end
+
+      def configuration
+        Moose.configuration
       end
 
       def gem_dir

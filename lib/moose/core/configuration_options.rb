@@ -87,6 +87,10 @@ module Moose
             parsed_args.snapshots = snapshots
           end
 
+          parser.on("-bt", "--[no-]back-trace", "full backtrace") do |backtrace|
+            parsed_args.show_full_error_backtrace = backtrace
+          end
+
           parser.separator <<-RUN_OPTIONS
 
             **** Test Run Options ****

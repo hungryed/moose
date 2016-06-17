@@ -23,6 +23,7 @@ module Moose
       :headless => false,
       :browser => :chrome,
       :rerun_failed => false,
+      :show_full_error_backtrace => false,
     }
 
     attr_accessor *DEFAULTS.keys
