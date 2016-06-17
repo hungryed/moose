@@ -5,6 +5,7 @@ require_relative 'test_case/all'
 
 module Moose
   class TestCase
+    class NoTestBlock < StandardError; end
     include TestStatus
 
     status_method :result
@@ -56,6 +57,7 @@ module Moose
           test_group.test_suite.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
             test_group.configuration.call_hooks_with_entity(entity: self, on_error: :fail_with_exception) do
               begin
+                raise NoTestBlock unless test_block
                 result = instance_eval(&test_block)
                 pass_or_result!(result)
               ensure
