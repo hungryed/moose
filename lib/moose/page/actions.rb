@@ -134,16 +134,13 @@ module Moose
         click_on(locator)
       end
 
-      private
+      def attach_file(locator, path)
+        wait_for_element(locator)
+        locator.set(path)
+      end
 
       def locator_is_enabled?(locator)
         locator.respond_to?(:enabled?) ? locator.enabled? : true
-      end
-
-      # Write a message saying that whatever we were looking for wasn't found
-      # @param [Watir::Element] locator The element that we failed to find
-      def not_found(locator)
-        Moose.msg.fail("#{locator} not found")
       end
     end
   end
