@@ -8,7 +8,7 @@ module Moose
       # @param [String] value The value to set
       def fill_text(locator, value)
         wait_for_element(locator)
-        meth = locator.respond_to?(:set) ? :set : :send_keys
+        meth = is_set_locator?(locator) ? :set : :send_keys
         locator.send(meth, value)
       end
 
@@ -36,10 +36,7 @@ module Moose
       # @return [Boolean] true when successful
       def click_on(element)
         wait_for_element(element)
-        wait_until do
-          element.click
-        end
-        true
+        element.click
       end
 
       # Given a locator, click on it and then wait till it disappears
@@ -141,6 +138,10 @@ module Moose
 
       def locator_is_enabled?(locator)
         locator.respond_to?(:enabled?) ? locator.enabled? : true
+      end
+
+      def is_set_locator?(locator)
+        locator.respond_to?(:set) && locator.is_a?(Watir::TextField)
       end
     end
   end

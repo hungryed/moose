@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "simplecov"
   spec.add_development_dependency('pry-byebug', '2.0.0')
 
-  spec.add_dependency('watir-webdriver')
-  spec.add_dependency('headless')
-  spec.add_dependency('colorize')
+  spec.add_dependency('watir-webdriver', "~> 0.9")
+  spec.add_dependency('headless', "~> 2.2.3")
+  spec.add_dependency('colorize', "~> 0.7")
 end
