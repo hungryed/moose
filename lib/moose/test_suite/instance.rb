@@ -28,6 +28,7 @@ module Moose
       def run!(opts = {})
         return self unless test_group_collection
         self.start_time = Time.now
+        Moose.msg.banner("Running Test Suite: #{name}") if name
         configuration.suite_hook_collection.call_hooks_with_entity(entity: self) do
           test_group_collection.run!(opts)
         end
@@ -37,7 +38,15 @@ module Moose
 
       def rerun_failed!(opts = {})
         return self unless test_group_collection
-        test_group_collection.rerun_failed!(opts)
+        return self unless has_failed_tests?
+        if name
+          Moose.msg.newline
+          Moose.msg.invert("Rerunning failed tests for #{name}")
+          Moose.msg.newline
+        end
+        configuration.suite_hook_collection.call_hooks_with_entity(entity: self) do
+          test_group_collection.rerun_failed!(opts)
+        end
         self.end_time = Time.now
         self
       end
@@ -51,6 +60,8 @@ module Moose
           reg = /(.*)#{config.suite_pattern.gsub(/\*/, '')}/
           directory_minus_suite_pattern = reg.match(directory)[1]
           File.basename(directory_minus_suite_pattern)
+        rescue
+          nil
         end
       end
 
@@ -67,7 +78,7 @@ module Moose
       end
 
       def metadata
-        [:time_elapsed,:start_time,:end_time,:directory].inject({}) do |memo, method|
+        [:time_elapsed,:start_time,:end_time,:directory,:name].inject({}) do |memo, method|
           begin
             memo.merge!(method => send(method))
             memo
@@ -81,6 +92,10 @@ module Moose
       def time_elapsed
         return unless end_time && start_time
         end_time - start_time
+      end
+
+      def has_failed_tests?
+        test_group_collection.has_failed_tests?
       end
 
       private

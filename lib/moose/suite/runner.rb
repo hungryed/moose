@@ -43,7 +43,7 @@ module Moose
       end
 
       def snapshot_directory
-        @snapshot_directory ||= File.join(Moose.world.current_directory, configuration.snapshot_directory)
+        @snapshot_directory ||= File.join(Moose.world.current_directory, configuration.moose_tests_directory, configuration.snapshot_directory)
       end
 
       def run!(opts = {})
@@ -78,12 +78,9 @@ module Moose
 
       def run_tests(opts)
         trimmed_test_suites.each_with_index do |suite, i|
-          Moose.msg.banner("Test Group #{i+1} of #{trimmed_test_suites.count}")
+          Moose.msg.banner("Test Suite #{i+1} of #{trimmed_test_suites.count}")
           suite.run!(opts)
           if configuration.rerun_failed
-            Moose.msg.newline
-            Moose.msg.invert("Rerunning failed tests for #{suite.name}")
-            Moose.msg.newline
             suite.rerun_failed!(opts)
           end
           suite.report!

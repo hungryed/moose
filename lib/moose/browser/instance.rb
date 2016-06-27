@@ -1,3 +1,5 @@
+require 'fileutils'
+
 module Moose
   module Browser
     class Instance
@@ -52,10 +54,13 @@ module Moose
       def take_screenshot(name: Time.now.to_s)
         # take a screen shot if the browser is still alive
         return unless watir_browser.exist?
+        return unless Moose.configuration.snapshots
         begin
-          file_path = File.join(snapshot_path, "#{name}.png")
+          ::FileUtils.mkdir_p(snapshot_path)
+          file_path = File.join(snapshot_path, "#{name}")
           browser.screenshot.save(file_path)
           Moose.msg.info("\tSNAPSHOT TAKEN: #{file_path}\n")
+          file_path
         rescue => e
           Moose.msg.error("\t*** UNABLE TO TAKE SNAPSHOT ***")
           raise
@@ -75,7 +80,10 @@ module Moose
       end
 
       def snapshot_path
-        @snapshot_path ||= File.join(Moose.world.current_directory, Moose.config.snapshot_directory, test_suite.name)
+        @snapshot_path ||= File.join(
+          Moose.suite.snapshot_directory,
+          test_suite.name
+        )
       end
     end
   end

@@ -17,7 +17,7 @@ module Moose
 
       def run!(opts = {})
         self.start_time = Time.now
-        filtered_cache.each do |test_group|
+        filtered_cache.each_with_index do |test_group, i|
           test_group.run!(opts)
         end
         self.end_time = Time.now
@@ -25,7 +25,8 @@ module Moose
       end
 
       def rerun_failed!(opts = {})
-        filtered_cache.each do |test_group|
+        return self unless has_failed_tests?
+        filtered_cache.each_with_index do |test_group, i|
           test_group.rerun_failed!(opts)
         end
         self.end_time = Time.now
@@ -65,6 +66,12 @@ module Moose
 
       def has_available_tests?
         filtered_cache.size > 0
+      end
+
+      def has_failed_tests?
+        filtered_cache.any? { |test_group|
+          test_group.has_failed_tests?
+        }
       end
 
       private

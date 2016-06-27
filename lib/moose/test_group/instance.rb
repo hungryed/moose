@@ -35,6 +35,7 @@ module Moose
       end
 
       def rerun_failed!(opts = {})
+        return self unless has_failed_tests?
         modified_options = opts.merge({:rerun => true})
         if run_in_threads?(opts)
           run_in_threads(failed_tests, modified_options)
@@ -49,6 +50,10 @@ module Moose
         filtered_test_case_cache.select { |test_case|
           test_case.failed?
         }
+      end
+
+      def has_failed_tests?
+        failed_tests.count > 0
       end
 
       def report!(opts = {})
@@ -135,6 +140,7 @@ module Moose
           test_case_set.each_with_index do |test_case, index|
             threads << Thread.new do
               run_test_case(
+                test_collection: test_collection,
                 test_case: test_case,
                 options: opts
               )
@@ -147,14 +153,17 @@ module Moose
       def run_out_of_threads(test_collection, opts = {})
         test_collection.each do |test_case|
           run_test_case(
+            test_collection: test_collection,
             test_case: test_case,
             options: opts
           )
         end
       end
 
-      def run_test_case(test_case:, options: {})
+      def run_test_case(test_collection:, test_case:, options: {})
         return if Moose.world.wants_to_quit
+        index = test_collection.index(test_case)
+        Moose.msg.banner("Running Test Case: #{index + 1} of #{test_collection.count}") if index
         test_case.run!(options)
       end
 
