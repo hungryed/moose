@@ -11,6 +11,13 @@ module Moose
         def backtrace
           BacktraceHelper.new(@full_backtrace).filtered_backtrace
         end
+
+        def as_json(*args)
+          {
+            :message => @message,
+            :full_backtrace => @full_backtrace && @full_backtrace.map(&:to_s)
+          }
+        end
       end
 
       def wait_until(options = {}, &block)
