@@ -15,7 +15,7 @@ module Moose
         def element(name,&block)
           raise ElementError, "Element name can not be nil" if name.nil?
           if existing_key?(name)
-            raise ElementError,"Duplicate definations for Element - #{name} on Page - #{to_s}"
+            raise ElementError,"Duplicate definitions for Element - #{name} on Page - #{to_s}"
           end
           elements[name] = block
         end
@@ -27,7 +27,7 @@ module Moose
         def section(name, klass, &block)
           raise SectionError, "Section name can not be nil" if name.nil?
           if existing_key?(name)
-            raise SectionError,"Duplicate definations for Section - #{name} on Page - #{to_s}"
+            raise SectionError,"Duplicate definitions for Section - #{name} on Page - #{to_s}"
           end
           sections[name] = {
             :klass => klass,
@@ -35,12 +35,28 @@ module Moose
           }
         end
 
+        def section_collections
+          @section_collections ||= {}
+        end
+
+        def section_collection(name, klass, &block)
+          raise SectionError, "Sections name can not be nil" if name.nil?
+          if existing_key?(name)
+            raise SectionError,"Duplicate definitions for Sections - #{name} on Page - #{to_s}"
+          end
+          section_collections[name] = {
+            :klass => klass,
+            :block => block
+          }
+        end
+
         def existing_key?(key_name)
-          !elements[key_name].nil? || !sections[key_name].nil?
+          !elements[key_name].nil? || !sections[key_name].nil? || !section_collections[key_name].nil?
         end
 
         def inherited(klass)
           klass.elements.merge!(elements)
+          klass.sections.merge!(sections)
         end
       end
 
@@ -48,6 +64,7 @@ module Moose
         @browser = browser
         add_element_methods
         add_section_methods
+        add_sections_methods
       end
 
       def go_to(path)
@@ -69,6 +86,28 @@ module Moose
         end
       end
 
+      def add_sections_methods # :nodoc:
+        self.class.section_collections.each do |section_name,section_details|
+          klass = section_details.fetch(:klass)
+          section_block = section_details.fetch(:block)
+
+          class_eval do
+            define_method(section_name) do
+              if memoizied = instance_variable_get("@#{section_name}")
+                memoizied
+              else
+                instance_variable_set("@#{section_name}", Section::Collection.new(
+                  :parent => self,
+                  :browser => @browser,
+                  :klass => klass,
+                  :element_block => section_block
+                ))
+              end
+            end
+          end
+        end
+      end
+
       def add_section_methods # :nodoc:
         self.class.sections.each do |section_name,section_details|
           klass = section_details.fetch(:klass)
@@ -81,7 +120,7 @@ module Moose
               else
                 instance_variable_set("@#{section_name}", klass.new(
                   :parent => self,
-                  :browser => browser,
+                  :browser => @browser,
                   :element_block => section_block
                 ))
               end

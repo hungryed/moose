@@ -74,7 +74,7 @@ module Moose
 
     private
 
-      def respond_to_missing?(meth)
+      def respond_to_missing?(meth, include_private = false)
         return true if watir_browser.respond_to?(meth)
         super
       end

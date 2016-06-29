@@ -1,6 +1,8 @@
 module Moose
   module Page
     class Section < Base
+      class InvalidElement < StandardError; end
+
       attr_reader :element_block, :parent
       class << self
         def locator_group(group_name)
@@ -20,19 +22,25 @@ module Moose
       end
 
       def element_for(*args)
-        locator = browser.locator_for(*args)
+        locator = @browser.locator_for(*args)
         element_type = locator.element_type
         # Watir includes extra methods if you use the more specific classes like TextField
-        elem = if element_type && _element.respond_to?(element_type.to_sym)
-          _element.send(element_type.to_sym, locator.css_or_xpath_params)
+        elem = if element_type && element.respond_to?(element_type.to_sym)
+          element.send(element_type.to_sym, locator.css_or_xpath_params)
         else
-          _element.element(locator.css_or_xpath_params)
+          element.element(locator.css_or_xpath_params)
         end
         elem
       end
 
-      def _element
+      def element
         parent.instance_exec(&element_block)
+      end
+
+      def browser
+        el = element
+        raise InvalidElement unless el
+        el
       end
     end
   end

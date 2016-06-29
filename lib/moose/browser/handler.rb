@@ -14,9 +14,9 @@ module Moose
         def new_browser(options = {})
           try = 0
           attempts = options.fetch(:attempts, 3)
-          setup_watir
           mutex.synchronize {
             begin
+              setup_watir
               if Moose.config.headless || options.fetch(:headless, false)
                 @headless = Headless.new
                 @headless.start
@@ -45,6 +45,8 @@ module Moose
                 # back up the call stack you go
                 raise e
               end
+            ensure
+              reset_watir_timeout
             end
             Moose.msg.info("Created new Watir browser object! pid #{browser_pid(@browser)}")
             @browser
@@ -85,7 +87,11 @@ module Moose
         end
 
         def setup_watir
-          @setup_watir ||= Watir.default_timeout = 180
+          Watir.default_timeout = 60
+        end
+
+        def reset_watir_timeout
+          Watir.default_timeout = nil
         end
 
         # Create a new chrome browser with MAGIC SETTINGS.
