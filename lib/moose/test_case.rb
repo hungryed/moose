@@ -53,11 +53,12 @@ module Moose
     def run!(opts={})
       self.start_time = Time.now
       begin
+        raise NoTestBlock unless test_block
+        Moose.msg.banner("Running Test Case: #{trimmed_filepath}")
         Moose.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
           test_group.test_suite.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
             test_group.configuration.call_hooks_with_entity(entity: self, on_error: :fail_with_exception) do
               begin
-                raise NoTestBlock unless test_block
                 result = instance_eval(&test_block)
                 pass_or_result!(result)
               ensure
@@ -95,7 +96,7 @@ module Moose
     end
 
     def trimmed_filepath
-      Utilities::FileUtils.trim_filename(file)
+      @trimmed_filepath ||= Utilities::FileUtils.trim_filename(file)
     end
 
     def final_report!(opts = {})

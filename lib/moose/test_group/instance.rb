@@ -46,20 +46,24 @@ module Moose
         self
       end
 
-      def failed_tests
-        filtered_test_case_cache.select { |test_case|
-          test_case.failed?
-        }
-      end
-
-      def has_failed_tests?
-        failed_tests.count > 0
-      end
-
-      def report!(opts = {})
-        filtered_test_case_cache.each do |test_case|
-          test_case.final_report!(opts)
+      TestStatus::POSSIBLE_STATUSES.each do |meth|
+        define_method("#{meth}_tests") do
+          filtered_test_case_cache.select { |test_case|
+            test_case.send("#{meth}?")
+          }
         end
+
+        define_method("has_#{meth}_tests?") do
+          send("#{meth}_tests").count > 0
+        end
+      end
+
+      def summary_report!(opts = {})
+        reporter.summary_report!(opts)
+      end
+
+      def final_report!(opts = {})
+        reporter.final_report!(opts)
       end
 
       def configuration
@@ -121,17 +125,21 @@ module Moose
         end_time - start_time
       end
 
+      def filtered_test_case_cache
+        @filtered_test_case_cache ||= []
+      end
+
       private
+
+      def reporter
+        @reporter ||= Reporter.new(self)
+      end
 
       def run_in_threads?(options = {})
         return configuration.run_in_threads unless configuration.run_in_threads.nil?
         option_to_run_in_threads = options.fetch(:run_in_threads, nil)
         return option_to_run_in_threads unless option_to_run_in_threads.nil?
         moose_config.run_in_threads
-      end
-
-      def filtered_test_case_cache
-        @filtered_test_case_cache ||= []
       end
 
       def run_in_threads(test_collection, opts = {})

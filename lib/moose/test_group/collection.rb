@@ -33,9 +33,15 @@ module Moose
         self
       end
 
-      def report!(opts = {})
+      def summary_report!(opts = {})
         filtered_cache.each do |test_group|
-          test_group.report!(opts)
+          test_group.summary_report!(opts)
+        end
+      end
+
+      def final_report!(opts = {})
+        filtered_cache.each do |test_group|
+          test_group.final_report!(opts)
         end
       end
 
@@ -68,10 +74,18 @@ module Moose
         filtered_cache.size > 0
       end
 
-      def has_failed_tests?
-        filtered_cache.any? { |test_group|
-          test_group.has_failed_tests?
-        }
+      TestStatus::POSSIBLE_STATUSES.each do |meth|
+        define_method("#{meth}_tests") do
+          filtered_cache.map { |test_group|
+            test_group.send("#{meth}_tests")
+          }.flatten
+        end
+
+        define_method("has_#{meth}_tests?") do
+          filtered_cache.any? { |test_group|
+            test_group.send("has_#{meth}_tests?")
+          }
+        end
       end
 
       private

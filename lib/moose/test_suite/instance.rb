@@ -94,8 +94,14 @@ module Moose
         end_time - start_time
       end
 
-      def has_failed_tests?
-        test_group_collection.has_failed_tests?
+      TestStatus::POSSIBLE_STATUSES.each do |meth|
+        define_method("#{meth}_tests") do
+          test_group_collection.send("#{meth}_tests")
+        end
+
+        define_method("has_#{meth}_tests?") do
+          test_group_collection.send("has_#{meth}_tests?")
+        end
       end
 
       private

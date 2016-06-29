@@ -1,5 +1,7 @@
 module Moose
   module TestStatus
+    POSSIBLE_STATUSES = [:failed, :passed, :incomplete, :pending, :skipped]
+
     def self.included(klass)
       klass.extend(ClassMethods)
       klass.include(InstanceMethods)
