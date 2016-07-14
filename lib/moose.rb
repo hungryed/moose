@@ -13,6 +13,7 @@ require "moose/configuration"
 require 'moose/suite'
 require 'moose/helpers/all'
 require 'moose/page/all'
+require 'moose/flow'
 
 module Moose
   class NoSuiteError < Moose::Error; end

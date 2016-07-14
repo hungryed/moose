@@ -57,6 +57,7 @@ module Moose
         def inherited(klass)
           klass.elements.merge!(elements)
           klass.sections.merge!(sections)
+          klass.section_collections.merge!(section_collections)
         end
       end
 
