@@ -217,7 +217,7 @@ Pages will be used in Moose::Flows
 Elements and Sections can be used as a method call within the same Page.
 When using Sections, you only have to require the files when the namespace of the section is different then the name space of the Page
 ```ruby
-require_relative '../menu/user_menu_section.rb
+require_relative '../menu/user_menu_section.rb'
 module Application
   module Home
     class SearchPage < Moose::Page::Full
