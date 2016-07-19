@@ -248,7 +248,7 @@ Sections can contain sections if you deem necessary
 ```ruby
 module Application
   module Home
-    class SearchResultSection < Moose::Page::Full
+    class SearchResultSection < Moose::Page::Section
       element(:result) { browser.a(:id, 'result_1') }
     end
   end
