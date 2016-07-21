@@ -50,7 +50,14 @@ bundle exec moose beta moose_tests/path/to/test_suite/and/test_group/specific_te
 |--moose_tests
 | |--app_one_suite
 | | |--lib
-| | |--locators
+| | | |--pages
+| | | | |--home
+| | | | | |--search_page.rb
+| | | | |--menu
+| | | | | |--user_menu_section.rb
+| | | |--flows
+| | | | |--search_flow.rb
+| | |--locators (optional)
 | | | |--creative_directory_locators
 | | | | |--creative_locators.yml
 | | | | |--better_creative_locators.yml
@@ -198,7 +205,86 @@ end
 ```ruby
 Moose.define_test_case do
   # test case logic goes here
+  # test case should try and use Flows for the logic
 end
+```
+
+### Page Configuration
+
+Pages are the files where the elements and single interactions are defined within Moose.
+Pages contains Elements, can contain one more Moose::Page::Section
+Pages will be used in Moose::Flows
+Elements and Sections can be used as a method call within the same Page.
+When using Sections, you only have to require the files when the namespace of the section is different then the name space of the Page
+```ruby
+require_relative '../menu/user_menu_section.rb'
+module Application
+  module Home
+    class SearchPage < Moose::Page::Full
+      self.path '/search'
+      element(:a_element) { browser.a(:id, 'link_somewhere') } # If you don't want to use the YAML locator files you can use the
+                                                               # webdriver native way to search for elements. Here it is Watir
+      section(:search_results, Application::Home::SearchRestultSection) { browser }
+      section(:different_name_space, Application::Menu::UserMenuSection) { browser }
+      def click_on_a
+        a_element.click
+      end
+      
+      def click_on_result
+        search_results.result.click
+      end
+    end
+  end
+end
+```
+
+### Section Configuration
+
+Sections are similar to Pages, except the Moose inheritance is different and that they contain no path
+It is required for the Page instanciating the Section to pass a block with the browser or the element wrapping the section you are breaking off the Page.
+Sections exist to DRY the page and keep the file smaller.
+Sections can contain sections if you deem necessary
+
+```ruby
+module Application
+  module Home
+    class SearchResultSection < Moose::Page::Section
+      element(:result) { browser.a(:id, 'result_1') }
+    end
+  end
+end
+```
+
+### Flow Configuration
+
+Flows are in place to DRY the test cases, having test cases contain logic leads to copy paste, keeping the logic on the flow, ensures that a change in test logic spans across multiple test cases.
+
+Also, a Flow is not only a single interaction with an Element on a Page, it is a set of interactions that lead to a result.
+Almost always a Flow method should return something to the Test Case.
+
+Flows can contain more than one page. You can instantiate a Flow within a Flow like instantianting a new Class in plain ruby.
+```ruby
+module Application
+  module Home
+    class SearchFlow < Moose::Flow
+    # :browser is always a required initiliazing attribute
+      initial_attributes(:test_case) # adds required initializer attributes
+      page(:search_page, Application::Home::SearchPage)
+      
+      def open_link
+        search_page.click_on_a
+      end
+      
+    end
+  end
+end
+
+# Instantiating a Flow
+
+Application::Home::SearchFlow.new(
+    :browser => browser
+    :test_case => 'Search test case'
+  )
 ```
 
 #### Fun Fact: An individual test case can have multiple browsers!
