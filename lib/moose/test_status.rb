@@ -24,13 +24,18 @@ module Moose
       INCOMPLETE = "INCOMPLETE"
       PENDING = "PENDING"
       SKIPPED = "SKIPPED"
+      POSSIBLE_RESULTS = [FAIL, PASS, INCOMPLETE, PENDING, SKIPPED]
 
       def pass_or_result!(result)
-        if [FAIL, PASS, INCOMPLETE, PENDING, SKIPPED].include?(result)
+        if find_result_status(result)
           assign_status(result)
         else
           pass!
         end
+      end
+
+      def find_result_status(status)
+        POSSIBLE_RESULTS.find { |stat| stat == status.to_s.upcase }
       end
 
       def pass!

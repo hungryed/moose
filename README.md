@@ -296,16 +296,29 @@ Moose.define_test_case do
   new_browser(:headless => true) # spins up a headless browser
   browser(index: 0) # will return first browser
 
-  run_as(OTHER_SUITE_NAME) do |suite_instance, suite_browser|
+  run_as(OTHER_SUITE_NAME) do |suite_instance, test_case, suite_browser|
 
   end
 
   # run block without browser
-  run_as(API_SUITE_NAME, :needs_browser => false) do |suite_instance|
+  run_as(API_SUITE_NAME, :needs_browser => false) do |suite_instance, test_case|
 
   end
 end
 ```
+
+#### To cut a test case short for whatever reason:
+```ruby
+Moose.define_test_case do
+  ...
+  short_circuit! :incomplete # possible values [:incomplete, :fail, :pass, :skipped, :pending]
+
+  run_as(OTHER_SUITE_NAME) do |suite_instance, test_case, suite_browser|
+
+  end
+  ...
+end
+
 
 ## Development
 

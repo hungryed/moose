@@ -2,6 +2,7 @@ module Moose
   class Flow
     class PageError < Moose::Error; end
     class ArgumentError < Moose::Error; end
+    include Helpers::Waiter
     attr_reader :browser
 
     class << self

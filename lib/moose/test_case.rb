@@ -59,7 +59,9 @@ module Moose
           test_group.test_suite.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
             test_group.configuration.call_hooks_with_entity(entity: self, on_error: :fail_with_exception) do
               begin
-                result = instance_eval(&test_block)
+                result = catch(:short_circuit) do
+                  instance_eval(&test_block)
+                end
                 pass_or_result!(result)
               ensure
                 self.end_time = Time.now
@@ -129,6 +131,12 @@ module Moose
     end
 
     private
+
+    def short_circuit!(status)
+      found_status = find_result_status(status)
+      raise ArgumentError, "#{status} not found in #{POSSIBLE_RESULTS}" unless found_status
+      throw :short_circuit, found_status
+    end
 
     def fail_with_exception(err)
       self.exception = err
