@@ -17,7 +17,7 @@ module Moose
         end
 
         def configure_from_options
-          configuration_options_instance.configure_from_options(::Moose.configuration)
+          configuration_options_instance.configure_from_options
         end
 
         def configuration_options_instance

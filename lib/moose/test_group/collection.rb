@@ -88,6 +88,12 @@ module Moose
         end
       end
 
+      def tests
+        filtered_cache.map { |test_group|
+          test_group.filtered_test_case_cache
+        }.flatten
+      end
+
       private
 
       def filtered_cache

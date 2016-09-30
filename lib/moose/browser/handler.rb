@@ -62,7 +62,7 @@ module Moose
             pid = browser_pid(b)
             Moose.msg.info("Closing Watir browser! pid #{pid}")
             if b.exists?
-              b.close
+              b.quit
             end
           rescue => e
             Moose.msg.error("Unable to close browser using Watir browser.close! - #{e.message}")

@@ -1,5 +1,6 @@
 require 'optparse'
 require 'ostruct'
+require_relative "test_status_persistor"
 
 module Moose
   module Core
@@ -26,7 +27,11 @@ module Moose
         assign_environment
       end
 
-      def configure_from_options(config)
+      def config
+        ::Moose.configuration
+      end
+
+      def configure_from_options
         select_keys_at(*::Moose::Configuration::DEFAULTS.keys).each do |key, value|
           config.send("#{key}=", value)
         end
@@ -39,7 +44,13 @@ module Moose
       end
 
       def files_to_run
-        @files_to_run ||= Utilities::FileUtils.aggregate_files_from(args)
+        @files_to_run ||= begin
+          if @rerun_last_failures
+            TestStatusPersistor.last_failed_example_filenames
+          else
+            Utilities::FileUtils.aggregate_files_from(args)
+          end
+        end
       end
 
       def parsed_args
@@ -75,7 +86,7 @@ module Moose
             parsed_args.headless = headless
           end
 
-          parser.on("-ft", "--[no-]rerun-failures", "rerun failed tests after completion") do |rerun_failed|
+          parser.on("-f", "--[no-]rerun-failures", "rerun failed tests after completion") do |rerun_failed|
             parsed_args.rerun_failed = rerun_failed
           end
 
@@ -87,7 +98,7 @@ module Moose
             parsed_args.snapshots = snapshots
           end
 
-          parser.on("-bt", "--[no-]back-trace", "full backtrace") do |backtrace|
+          parser.on("-b", "--[no-]back-trace", "full backtrace") do |backtrace|
             parsed_args.show_full_error_backtrace = backtrace
           end
 
@@ -98,6 +109,11 @@ module Moose
               TODO:
 
           RUN_OPTIONS
+
+          parser.on("--ft", "--rerun-last-failures", 'Run the tests that failed in the most recent run',
+                    "(must have a test_status_persistence_directory specified in the configuration)") do
+            @rerun_last_failures = true
+          end
 
           parser.on("--tags=VALUES", "--flags=VALUES", Array, 'Run examples with the specified tag, or exclude examples',
                     "by adding ~ before the tag.",

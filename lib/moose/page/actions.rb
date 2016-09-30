@@ -1,7 +1,10 @@
+require_relative '../maybe_handler'
+
 module Moose
   module Page
     module Actions
       include Helpers::Waiter
+      include MaybeHandler
 
       # Given an element, set the provided value
       # @param [Watir::Element] locator The element that we want to set a value for

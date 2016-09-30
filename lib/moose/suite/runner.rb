@@ -52,6 +52,7 @@ module Moose
         configuration.run_hook_collection.call_hooks_with_entity(entity: ::Moose) do
           run_tests(opts)
         end
+        persist_failed_tests!
         end_run
         self
       end
@@ -74,6 +75,16 @@ module Moose
       def time_elapsed
         return unless start_time && end_time
         end_time - start_time
+      end
+
+      def persist_failed_tests!
+        Core::TestStatusPersistor.persist!(tests)
+      end
+
+      def tests
+        trimmed_test_suites.each_with_object([]) do |test_suite, memo|
+          memo.push(*test_suite.tests)
+        end
       end
 
       def run_tests(opts)

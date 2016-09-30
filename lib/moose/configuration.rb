@@ -24,6 +24,7 @@ module Moose
       :browser => :chrome,
       :rerun_failed => false,
       :show_full_error_backtrace => false,
+      :test_status_persistence_directory => nil,
     }
 
     attr_accessor *DEFAULTS.keys

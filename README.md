@@ -118,11 +118,13 @@ Moose.configure do |config|
   #   :browser => :chrome,
   #   :rerun_failed => false,
   #   :show_full_error_backtrace => false,
+  #   :test_status_persistence_directory => nil,
   # }
 
   config.verbose = true
   config.run_in_threads = true
   config.test_thread_count = 5
+  config.test_status_persistence_directory = File.expand_path("tmp", __FILE__)
 end
 
 ```
@@ -229,7 +231,7 @@ module Application
       def click_on_a
         a_element.click
       end
-      
+
       def click_on_result
         search_results.result.click
       end
@@ -270,11 +272,11 @@ module Application
     # :browser is always a required initiliazing attribute
       initial_attributes(:test_case) # adds required initializer attributes
       page(:search_page, Application::Home::SearchPage)
-      
+
       def open_link
         search_page.click_on_a
       end
-      
+
     end
   end
 end
@@ -286,6 +288,74 @@ Application::Home::SearchFlow.new(
     :test_case => 'Search test case'
   )
 ```
+
+### Flows, Pages, and Sections
+
+All flows, pages, and sections have shared helper methods
+
+#### wait_until
+
+This method will keep trying until the provided block returns true.
+If the provided block returns false or raises an error over and over then an error will be raised at the
+end of the timeout.
+
+```ruby
+module Application
+  module Home
+    class SearchFlow < Moose::Flow
+      def fill_in_search
+        wait_until do
+          search_page.search_box_present?
+        end
+      end
+    end
+  end
+end
+```
+
+##### valid options
+| Parameter    | Type   | Example                       |
+| ------------ | :----- | ----------------------------: |
+| timeout      | Number | wait_until(timeout: 30)...    |
+| sleep_time   | Number | wait_until(sleep_time: 30)... |
+
+
+#### maybe_block
+
+This method will keep trying until the provided block returns true.
+If the provided block returns false or raises an error over and over then an error will be raised at the
+end of the timeout.
+
+```ruby
+module Application
+  module Home
+    class SearchFlow < Moose::Flow
+      def fill_in_search
+        maybe_block do |maybe|
+          maybe.on_success do # optional
+            search_page.fill_in_search_box
+          end
+
+          maybe.on_failure do # optional
+            puts "oh no the search box was never found"
+          end
+
+          maybe.loop_over do # required
+            search_page.search_box_present?
+          end
+        end
+      end
+    end
+  end
+end
+```
+
+##### valid options
+| Parameter    | Type   | Example                       |
+| ------------ | :----- | ----------------------------: |
+| timeout      | Number | maybe_block(timeout: 30)...    |
+| sleep_time   | Number | maybe_block(sleep_time: 30)... |
+
 
 #### Fun Fact: An individual test case can have multiple browsers!
 ```ruby

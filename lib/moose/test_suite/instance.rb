@@ -104,6 +104,10 @@ module Moose
         end
       end
 
+      def tests
+        test_group_collection.tests
+      end
+
       private
 
       def test_group_directory_pattern

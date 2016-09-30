@@ -1,8 +1,11 @@
+require_relative 'maybe_handler'
+
 module Moose
   class Flow
     class PageError < Moose::Error; end
     class ArgumentError < Moose::Error; end
     include Helpers::Waiter
+    include MaybeHandler
     attr_reader :browser
 
     class << self

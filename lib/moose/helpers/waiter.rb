@@ -22,6 +22,7 @@ module Moose
 
       def wait_until(options = {}, &block)
         options[:timeout] ||= 10
+        sleep_timer = options[:sleep_time] ||= 0.1
 
         start_time = Time.now
 
@@ -32,7 +33,7 @@ module Moose
                 "The block never returned",caller_locations
               )
             end
-            sleep 0.1
+            sleep sleep_timer.to_f
           end
         rescue => e
           retry unless (Time.now - start_time) > options[:timeout]
