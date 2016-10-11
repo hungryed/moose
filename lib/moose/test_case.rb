@@ -6,6 +6,7 @@ require_relative 'test_case/all'
 module Moose
   class TestCase
     class NoTestBlock < StandardError; end
+    class ShortCircuit < StandardError; end
     include TestStatus
 
     status_method :result
@@ -135,7 +136,11 @@ module Moose
     def short_circuit!(status)
       found_status = find_result_status(status)
       raise ArgumentError, "#{status} not found in #{POSSIBLE_RESULTS}" unless found_status
-      throw :short_circuit, found_status
+      if found_status == self.class::FAIL
+        raise ShortCircuit
+      else
+        throw :short_circuit, found_status
+      end
     end
 
     def fail_with_exception(err)
