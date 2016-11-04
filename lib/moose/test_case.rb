@@ -2,12 +2,15 @@ require_relative 'harness'
 require_relative 'browser'
 require_relative 'test_status'
 require_relative 'test_case/all'
+require_relative "utilities"
 
 module Moose
   class TestCase
     class NoTestBlock < StandardError; end
     class ShortCircuit < StandardError; end
     include TestStatus
+    include Utilities::Inspectable
+    inspector(:file)
 
     status_method :result
     attr_accessor :test_block, :start_time, :end_time, :result, :exception, :has_run

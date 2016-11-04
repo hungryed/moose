@@ -3,6 +3,8 @@ module Moose
     class Base
       class ElementError < Moose::Error; end
       class SectionError < Moose::Error; end
+      include Utilities::Inspectable
+      inspector(:browser)
 
       include Actions
       attr_reader :browser

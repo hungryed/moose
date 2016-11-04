@@ -21,9 +21,12 @@ module Moose
                   else
                     raw_value
                   end
-          [:to_s, :to_sym].each do |meth|
-            modified_hash[key.send(meth)] ||= value
+          if key.is_a?(String)
+            modified_hash[key.to_sym] ||= value
+          elsif key.is_a?(Symbol)
+            modified_hash[key.to_s] ||= value
           end
+          modified_hash[key] ||= value
         end
         self
       end
@@ -41,11 +44,18 @@ module Moose
                   else
                     raw_value
                   end
-          [:to_s, :to_sym].each do |meth|
-            modified_hash[key.send(meth)] ||= value
+          if key.is_a?(String)
+            modified_hash[key.to_sym] ||= value
+          elsif key.is_a?(Symbol)
+            modified_hash[key.to_s] ||= value
           end
+          modified_hash[key] ||= value
         end
         modified_hash
+      end
+
+      def inspect
+        modified_hash.inspect
       end
 
       def method_missing(meth, *args, &block)

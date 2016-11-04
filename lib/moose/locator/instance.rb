@@ -4,6 +4,7 @@ module Moose
       ElementTypeNotFoundError = Class.new(StandardError)
       LocatorNotValidError = Class.new(StandardError)
       attr_accessor :selector
+      include Utilities::Inspectable
 
       class << self
         def build_from_hash(hash)

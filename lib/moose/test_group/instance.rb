@@ -5,6 +5,8 @@ module Moose
     class Instance < Base
       attr_accessor :start_time, :end_time
       attr_reader :directory, :description, :test_suite
+      include Utilities::Inspectable
+      inspector(:name)
 
       def initialize(directory:, description:, test_suite:)
         @directory = directory

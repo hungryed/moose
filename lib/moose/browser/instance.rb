@@ -1,9 +1,11 @@
 require 'fileutils'
+require_relative "../utilities"
 
 module Moose
   module Browser
     class Instance
       attr_reader :test_suite, :test_case, :browser_options
+      include Utilities::Inspectable
 
       def initialize(test_suite:, test_case: ,browser_options: {})
         @test_suite = test_suite

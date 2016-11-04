@@ -20,7 +20,6 @@ module Moose
             entity.instance_eval(&@loop_over)
           end
           entity.instance_eval(&@on_success) if @on_success
-          true
         rescue => e
           entity.instance_eval(&@on_failure) if @on_failure
           false
