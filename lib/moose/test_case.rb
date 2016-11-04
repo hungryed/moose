@@ -130,17 +130,17 @@ module Moose
       )
     end
 
-    def inspect
-      '#<%s:0x%x file=%s>' % [self.class, hash*2, file]
+    def rerun_script
+      reporter.rerun_script
     end
 
     private
 
-    def short_circuit!(status)
+    def short_circuit!(status, msg="short circuit")
       found_status = find_result_status(status)
       raise ArgumentError, "#{status} not found in #{POSSIBLE_RESULTS}" unless found_status
       if found_status == self.class::FAIL
-        raise ShortCircuit
+        raise ShortCircuit, msg
       else
         throw :short_circuit, found_status
       end
@@ -152,7 +152,7 @@ module Moose
     end
 
     def reporter
-      Reporter.new(self)
+      @reporter ||= Reporter.new(self)
     end
 
     def teardown

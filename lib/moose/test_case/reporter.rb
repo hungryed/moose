@@ -12,7 +12,7 @@ module Moose
         with_details do
           if test_case.failed?
             failure_script
-            rerun_script
+            rerun_dialog
           end
         end
       end
@@ -27,9 +27,13 @@ module Moose
         end
       end
 
-      def rerun_script
+      def rerun_dialog
         newline
         message_with(:info, "To Rerun")
+        rerun_script
+      end
+
+      def rerun_script
         message_with(:info, "bundle exec moose #{Moose.environment} #{test_case.trimmed_filepath}")
       end
 

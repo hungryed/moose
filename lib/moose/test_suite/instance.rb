@@ -54,7 +54,11 @@ module Moose
       end
 
       def report!(opts = {})
-        Reporter.new(self).report!(opts)
+        reporter.report!(opts)
+      end
+
+      def time_summary_report
+        reporter.time_summary_report
       end
 
       def name
@@ -111,6 +115,10 @@ module Moose
       end
 
       private
+
+      def reporter
+        @reporter ||= Reporter.new(self)
+      end
 
       def test_group_directory_pattern
         config.moose_test_group_directory_pattern.gsub('**', '*')

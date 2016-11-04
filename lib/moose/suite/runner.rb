@@ -67,9 +67,19 @@ module Moose
       end
 
       def end_run
+        print_summary_information
         self.end_time = Time.now
         Moose.msg.newline
         Moose.msg.banner("total time: #{time_elapsed}")
+      end
+
+      def print_summary_information
+        trimmed_test_suites.each(&:time_summary_report)
+        failures = failed_tests
+        if failures.any?
+          Moose.msg.info("Failed Tests:")
+          failures.each(&:rerun_script)
+        end
       end
 
       def time_elapsed
@@ -79,6 +89,12 @@ module Moose
 
       def persist_failed_tests!
         Core::TestStatusPersistor.persist!(tests)
+      end
+
+      def failed_tests
+        tests.select { |test|
+          test.failed?
+        }
       end
 
       def tests
