@@ -142,6 +142,7 @@ module Moose
       if found_status == self.class::FAIL
         raise ShortCircuit, msg
       else
+        Moose.msg.send(status, msg)
         throw :short_circuit, found_status
       end
     end

@@ -41,6 +41,7 @@ module Moose
 
       alias_method :before_each_test_case, :add_before_hook
       alias_method :after_each_test_case, :add_after_hook
+      alias_method :around_each_test_case, :add_around_hook
 
       private
 
