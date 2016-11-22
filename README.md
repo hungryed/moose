@@ -105,6 +105,12 @@ Moose.configure do |config|
     puts "in base config after test case hook"
   end
 
+  config.around_each_test_case do |test_case, blk|
+    puts "in base config around test case hook before call"
+    blk.call
+    puts "in base config around test case hook after call"
+  end
+
   # OPTIONS
   # DEFAULTS = {
   #   :verbose => false,
@@ -173,6 +179,12 @@ Moose.configure_suite do |config|
     puts "in suite after test case hook"
   end
 
+  config.around_each_test_case do |test_case, blk|
+    puts "in suite around test case hook before call"
+    blk.call
+    puts "in suite around test case hook after call"
+  end
+
   config.add_before_suite_hook do |test_suite|
     puts "in suite before suite hook"
   end
@@ -194,6 +206,12 @@ Moose.configure_test_group do |config|
 
   config.add_after_hook do |test_case|
     puts "in test case after hook"
+  end
+
+  config.add_around_hook do |test_case, blk|
+    puts "in around test case hook before call"
+    blk.call
+    puts "in around test case hook after call"
   end
 
   #OPTIONS
