@@ -4,6 +4,7 @@ module Moose
       def call_hooks_with_entity(entity:, on_error: nil, &block)
         error_to_raise = nil
         begin
+          call_around_hook_set(entity, &block)
           call_hook_set(before_hooks, entity)
           block.call
         rescue => e
@@ -32,11 +33,21 @@ module Moose
         after_hooks << block_entity
       end
 
+      def add_around_hook(block_entity)
+        around_hooks << block_entity
+      end
+
       private
 
       def call_hook_set(hook_set, entity)
         hook_set.each do |hook|
           hook.call_with_entity(entity)
+        end
+      end
+
+      def call_around_hook_set(entity, &block)
+        around_hooks.each do |hook|
+          hook.call_with_entity(entity, &block)
         end
       end
 
@@ -46,6 +57,10 @@ module Moose
 
       def after_hooks
         @after_hooks ||= []
+      end
+
+      def around_hooks
+        @around_hooks ||= []
       end
     end
   end
