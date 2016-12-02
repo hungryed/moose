@@ -1,3 +1,5 @@
+require_relative "configuration"
+
 module Moose
   module Utilities
     module Message
@@ -6,6 +8,14 @@ module Moose
           array.each do |element|
             call_on_message(message_type, element, force)
           end
+        end
+
+        def configure(&block)
+          yield(configuration)
+        end
+
+        def configuration
+          @configuration ||= Configuration.new
         end
 
         def method_missing(meth, *args, &block)
