@@ -69,7 +69,6 @@ module Moose
               ::Process.kill('KILL', pid)
             rescue Errno::ESRCH => e
               Moose.msg.error("Unable to kill browser using Process.kill!")
-              raise
             else
               Moose.msg.info("Killed browser! pid #{pid}")
             end
