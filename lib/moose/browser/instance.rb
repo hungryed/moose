@@ -26,30 +26,6 @@ module Moose
         end
       end
 
-      def locators
-        @locators ||= test_suite.locators
-      end
-
-      def locator_set_for(set_name)
-        locators.locator_set_for(set_name)
-      end
-
-      def locator_for(set, *names)
-        locators.locator_for(set,*names)
-      end
-
-      def element_for(set, *names)
-        locator = locator_for(set,*names)
-        element_type = locator.element_type
-        # Watir includes extra methods if you use the more specific classes like TextField
-        elem = if element_type && watir_browser.respond_to?(element_type.to_sym)
-          watir_browser.send(element_type.to_sym, locator.css_or_xpath_params)
-        else
-          watir_browser.element(locator.css_or_xpath_params)
-        end
-        elem
-      end
-
       # Take a screen shot of the browser and save in given directory
       # @param [Watir::Browser] browser Browser to take a screenshot from
       # @param [String] snapshot_dir Directory path to save the screenshot to

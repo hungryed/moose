@@ -1,7 +1,7 @@
 module Moose
   module TestGroup
     class Builder < Base
-      attr_reader :directory, :locator_list, :test_group, :test_suite
+      attr_reader :directory, :test_group, :test_suite
 
       def initialize(directory:, test_suite:)
         @directory = directory

@@ -2,7 +2,7 @@ module Moose
   module TestSuite
     class Instance < Base
       attr_accessor :start_time, :end_time
-      attr_reader :directory, :locators, :test_group_collection
+      attr_reader :directory, :test_group_collection
       include Utilities::Inspectable
       inspector(:name)
 
@@ -12,9 +12,7 @@ module Moose
 
       def build_dependencies
         Dir.glob(File.join(directory, "*")) { |test_dir|
-          if test_dir =~ /locators$/
-            build_locators_from(test_dir)
-          elsif test_dir =~ /#{test_group_directory_pattern}/
+          if test_dir =~ /#{test_group_directory_pattern}/
             build_test_groups_from(test_dir)
           elsif test_dir =~ /.*_configuration\.rb/
             configuration.load_file(test_dir)
@@ -127,11 +125,6 @@ module Moose
       def build_test_groups_from(directory)
         test_group_builder = TestGroup::Builder.new(directory: directory, test_suite: self)
         @test_group_collection = test_group_builder.build_list.collection
-      end
-
-      def build_locators_from(directory)
-        builder = Locator::Builder.new(directory)
-        @locators = builder.build_list.collection
       end
     end
   end

@@ -57,11 +57,6 @@ bundle exec moose beta moose_tests/path/to/test_suite/and/test_group/specific_te
 | | | | | |--user_menu_section.rb
 | | | |--flows
 | | | | |--search_flow.rb
-| | |--locators (optional)
-| | | |--creative_directory_locators
-| | | | |--creative_locators.yml
-| | | | |--better_creative_locators.yml
-| | | |--some_locators.yml
 | | |--test_groups
 | | | |--creative_directory_name
 | | | | |--test_cases
@@ -75,7 +70,6 @@ bundle exec moose beta moose_tests/path/to/test_suite/and/test_group/specific_te
 | | | |--app_one_tests_configuration.rb
 | |--other_app_suite
 | | |--lib
-| | |--locators
 | | |--test_groups
 | |--moose_configuration.rb
 ```
@@ -141,6 +135,41 @@ For example:
 
 ```bash
 bundle exec moose --headless
+```
+
+### Moose Message Configuration
+
+```ruby
+Moose.msg.configure do |config|
+  # OPTIONS
+  # COLOR_DEFAULTS = {
+  #   :failure_font_color => :white,
+  #   :failure_background_color => :red,
+  #   :pass_font_color => :white,
+  #   :pass_background_color => :green,
+  #   :pending_font_color => :white,
+  #   :pending_background_color => :magenta,
+  #   :skipped_font_color => :white,
+  #   :skipped_background_color => :light_red,
+  #   :incomplete_font_color => :white,
+  #   :incomplete_background_color => :yellow,
+  #   :invert_font_color => :white,
+  #   :invert_background_color => :black,
+  #   :name_font_color => :white,
+  #   :name_background_color => :cyan,
+  #   :case_description_font_color => :cyan,
+  #   :banner_font_color => :blue,
+  #   :info_font_color => :blue,
+  #   :header_font_color => :cyan,
+  #   :warn_font_color => :yellow,
+  #   :error_font_color => :red,
+  #   :step_font_color => :yellow,
+  #   :dot_font_color => :yellow,
+  # }
+
+  config.info_font_color = :green
+end
+
 ```
 
 
@@ -242,8 +271,7 @@ module Application
   module Home
     class SearchPage < Moose::Page::Full
       self.path '/search'
-      element(:a_element) { browser.a(:id, 'link_somewhere') } # If you don't want to use the YAML locator files you can use the
-                                                               # webdriver native way to search for elements. Here it is Watir
+      element(:a_element) { browser.a(:id, 'link_somewhere') }
       section(:search_results, Application::Home::SearchRestultSection) { browser }
       section(:different_name_space, Application::Menu::UserMenuSection) { browser }
       def click_on_a
@@ -378,9 +406,9 @@ end
 #### Fun Fact: An individual test case can have multiple browsers!
 ```ruby
 Moose.define_test_case do
-  browser # will return the latest browser or spin up new browser with the current test suite's locators
-  new_browser # spins up a new browser with the current test suite's locators
-  new_browser(:browser => :firefox) # spins up a new firefox browser with the current test suite's locators
+  browser # will return the latest browser or spin up new browser
+  new_browser # spins up a new browser
+  new_browser(:browser => :firefox) # spins up a new firefox browser
   new_browser(:headless => true) # spins up a headless browser
   browser(index: 0) # will return first browser
 
@@ -399,7 +427,7 @@ end
 ```ruby
 Moose.define_test_case do
   ...
-  short_circuit! :incomplete # possible values [:incomplete, :fail, :pass, :skipped, :pending]
+  short_circuit! :incomplete, "Message for why here" # possible values [:incomplete, :fail, :pass, :skipped, :pending]
 
   run_as(OTHER_SUITE_NAME) do |suite_instance, test_case, suite_browser|
 

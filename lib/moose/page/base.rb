@@ -11,7 +11,15 @@ module Moose
 
       class << self
         def elements
-          @elements ||= {}
+          parent_elements.merge(self_elements)
+        end
+
+        def self_elements
+          @self_elements ||= {}
+        end
+
+        def parent_elements
+          @parent_elements ||= {}
         end
 
         def element(name,&block)
@@ -19,11 +27,19 @@ module Moose
           if existing_key?(name)
             raise ElementError,"Duplicate definitions for Element - #{name} on Page - #{to_s}"
           end
-          elements[name] = block
+          self_elements[name] = block
+        end
+
+        def self_sections
+          @self_sections ||= {}
+        end
+
+        def parent_sections
+          @parent_sections ||= {}
         end
 
         def sections
-          @sections ||= {}
+          parent_sections.merge(self_sections)
         end
 
         def section(name, klass, &block)
@@ -31,14 +47,22 @@ module Moose
           if existing_key?(name)
             raise SectionError,"Duplicate definitions for Section - #{name} on Page - #{to_s}"
           end
-          sections[name] = {
+          self_sections[name] = {
             :klass => klass,
             :block => block
           }
         end
 
+        def self_section_collections
+          @self_section_collections ||= {}
+        end
+
+        def parent_section_collections
+          @parent_section_collections ||= {}
+        end
+
         def section_collections
-          @section_collections ||= {}
+          parent_section_collections.merge(self_section_collections)
         end
 
         def section_collection(name, klass, &block)
@@ -46,20 +70,20 @@ module Moose
           if existing_key?(name)
             raise SectionError,"Duplicate definitions for Sections - #{name} on Page - #{to_s}"
           end
-          section_collections[name] = {
+          self_section_collections[name] = {
             :klass => klass,
             :block => block
           }
         end
 
         def existing_key?(key_name)
-          !elements[key_name].nil? || !sections[key_name].nil? || !section_collections[key_name].nil?
+          !self_elements[key_name].nil? || !self_sections[key_name].nil? || !self_section_collections[key_name].nil?
         end
 
         def inherited(klass)
-          klass.elements.merge!(elements)
-          klass.sections.merge!(sections)
-          klass.section_collections.merge!(section_collections)
+          klass.parent_elements.merge!(elements)
+          klass.parent_sections.merge!(sections)
+          klass.parent_section_collections.merge!(section_collections)
         end
       end
 
@@ -75,10 +99,6 @@ module Moose
         wait_until do
           browser.ready_state == 'complete'
         end
-      end
-
-      def element_for(*args)
-        browser.element_for(*args)
       end
 
       private

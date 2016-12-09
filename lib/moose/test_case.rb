@@ -26,10 +26,6 @@ module Moose
       Moose.load_test_case_from_file(file: file, test_case: self)
     end
 
-    def locators
-      test_case.test_group.test_suite.locators.cache
-    end
-
     def base_url
       test_group.test_suite.configuration.base_url
     end
