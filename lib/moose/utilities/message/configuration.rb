@@ -14,9 +14,9 @@ module Moose
           :pending_font_color => :white,
           :pending_background_color => :magenta,
           :skipped_font_color => :white,
-          :skipped_background_color => :orange,
-          :skipped_font_color => :white,
-          :skipped_background_color => :yellow,
+          :skipped_background_color => :light_red,
+          :incomplete_font_color => :white,
+          :incomplete_background_color => :yellow,
           :invert_font_color => :white,
           :invert_background_color => :black,
           :name_font_color => :white,
@@ -47,11 +47,10 @@ module Moose
             end
 
             define_method("#{meth}=") do |value|
-              if VALID_COLORS.include?(value)
-                instance_variable_set("@#{meth}", value)
-              else
-                raise InvalidColor
+              unless VALID_COLORS.include?(value)
+                raise InvalidColor.new("#{value} not found in #{VALID_COLORS}")
               end
+              instance_variable_set("@#{meth}", value)
             end
           end
         end
