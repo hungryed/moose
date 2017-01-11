@@ -50,7 +50,15 @@ module Moose
         end
 
         def status_filepath
-          File.join(filepath, FILENAME)
+          File.join(filepath, file_name)
+        end
+
+        def file_name
+          if prefix = ENV["MOOSE_STATUS_FILE_PREFIX"]
+            "#{prefix}_#{FILENAME}"
+          else
+            FILENAME
+          end
         end
 
         def filepath

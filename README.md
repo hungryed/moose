@@ -134,7 +134,24 @@ Under the above implemention, to designate a global config option you would need
 For example:
 
 ```bash
-bundle exec moose --headless
+bundle exec moose #{ENVIRONMENT} --headless
+```
+
+To rerun failed tests from the previous run you must have `test_status_persistence_directory` set.
+Then you can run.
+
+```
+bundle exec moose #{ENVIRONMENT} --ft
+```
+
+If you are running in multiple tabs then you can also save your test statuses to different files with:
+```
+MOOSE_STATUS_FILE_PREFIX=1 bundle exec moose #{ENVIRONMENT}
+```
+
+then to rerun those failed tests you just:
+```
+MOOSE_STATUS_FILE_PREFIX=1 bundle exec moose #{ENVIRONMENT} --ft
 ```
 
 ### Moose Message Configuration
