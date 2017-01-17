@@ -34,7 +34,7 @@ module Moose
       end
 
       def rerun_script
-        message_with(:info, "bundle exec moose #{Moose.environment} #{test_case.trimmed_filepath}")
+        message_with(:info, "#{environment_variables} bundle exec moose #{Moose.environment} #{test_case.trimmed_filepath}")
       end
 
       private
@@ -45,6 +45,15 @@ module Moose
 
       def trimmed_backtrace
         Helpers::BacktraceHelper.new(err.backtrace).filtered_backtrace
+      end
+
+      def environment_variables
+        memo = ""
+        Array(Moose.configuration.environment_variables).each do |var_name|
+          value = ENV[var_name]
+          memo += "#{var_name}=#{value}" if value
+        end
+        memo
       end
 
       def with_details(&block)
