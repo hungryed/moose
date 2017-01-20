@@ -1,4 +1,3 @@
-require 'watir-webdriver'
 require 'headless'
 
 module Moose
