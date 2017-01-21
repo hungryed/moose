@@ -51,7 +51,7 @@ module Moose
         memo = ""
         Array(Moose.configuration.environment_variables).each do |var_name|
           value = ENV[var_name]
-          memo += "#{var_name}=#{value}" if value
+          memo += "#{var_name}=#{value} " if value
         end
         memo
       end
