@@ -1,4 +1,4 @@
-require 'watir-webdriver'
+require 'watir'
 require 'colorize'
 require 'json'
 
