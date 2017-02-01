@@ -25,10 +25,15 @@ module Moose
       def parse_args
         option_parser.parse!(args)
         assign_environment
+        assign_run_opts
       end
 
       def config
-        ::Moose.configuration
+        @config ||= ::Moose.configuration
+      end
+
+      def assign_run_opts
+        config.run_options = args
       end
 
       def configure_from_options
@@ -46,7 +51,7 @@ module Moose
       def files_to_run
         @files_to_run ||= begin
           if @rerun_last_failures
-            TestStatusPersistor.last_failed_example_filenames
+            TestStatusPersistor.last_failed_example_filenames(config)
           else
             Utilities::FileUtils.aggregate_files_from(args)
           end

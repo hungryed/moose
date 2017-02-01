@@ -16,7 +16,7 @@ module Moose
       end
 
       def watir_browser
-        @watir_browser ||= Handler.new_browser(browser_options)
+        @watir_browser ||= Handler.new_browser(test_case.moose_configuration, browser_options)
       end
 
       def close!
@@ -32,7 +32,7 @@ module Moose
       def take_screenshot(name: Time.now.to_s)
         # take a screen shot if the browser is still alive
         return unless watir_browser.exist?
-        return unless Moose.configuration.snapshots
+        return unless test_case.moose_configuration.snapshots
         begin
           ::FileUtils.mkdir_p(snapshot_path)
           file_path = File.join(snapshot_path, "#{name}")

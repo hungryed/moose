@@ -3,17 +3,23 @@ require_relative "../test_suite"
 module Moose
   module Suite
     class Aggregator
+      attr_reader :configuration
       class << self
-        def test_suites
-          instance.test_suites
+        def test_suites(configuration)
+          instance(configuration).test_suites
         end
 
-        def instance
-          @instance ||= new
+        def instance(configuration)
+          @instance ||= new(configuration)
+        end
+
+        def reset!
+          @instance = nil
         end
       end
 
-      def initialize
+      def initialize(configuration)
+        @configuration = configuration
         run_config
       end
 
@@ -25,7 +31,7 @@ module Moose
 
       def all_suites
         @all_suites ||= Dir.glob(suites_directories).map { |directory|
-          TestSuite::Builder.new(directory).build
+          TestSuite::Builder.new(directory, configuration).build
         }
       end
 
@@ -36,15 +42,11 @@ module Moose
       end
 
       def suites_directories
-        @suites_directories ||= File.join(moose_tests_directory, config.suite_pattern)
+        @suites_directories ||= File.join(moose_tests_directory, configuration.suite_pattern)
       end
 
       def moose_tests_directory
-        @moose_tests_directory ||= File.join(Moose.world.current_directory, config.moose_tests_directory)
-      end
-
-      def config
-        @config ||= Moose.configuration
+        @moose_tests_directory ||= File.join(Moose.world.current_directory, configuration.moose_tests_directory)
       end
     end
   end

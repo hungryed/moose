@@ -36,11 +36,13 @@ module Moose
     end
 
     def require_files!
-      ::Moose::Suite::Runner.require_files!
+      ::Moose::Suite::Runner.require_files!(configuration)
     end
 
     def run!(opts = {})
-      ::Moose::Suite::Runner.run!(opts)
+      with_cleanup {
+        ::Moose::Suite::Runner.run!(opts)
+      }
     end
 
     def suite
@@ -59,6 +61,12 @@ module Moose
 
     def configure(&block)
       ::Moose::Configuration.configure(&block)
+    end
+
+    def with_cleanup
+      ::Moose::Suite::Aggregator.reset!
+      yield
+      ::Moose::Suite::Runner.reset!
     end
 
     # Loading configurations (serially)

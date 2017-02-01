@@ -2,7 +2,8 @@ module Moose
   module Core
     class Runner
       class << self
-        def invoke
+        def invoke(args = ARGV)
+          @args = args
           trap_interrupt
           configuration_options_instance.parse_args
           ::Moose.require_files!
@@ -13,7 +14,10 @@ module Moose
         private
 
         def run_options
-          configuration_options_instance.moose_run_args
+          options = configuration_options_instance.moose_run_args
+          # clean it out for future runs to happen concurrently
+          @configuration_options_instance = nil
+          options
         end
 
         def configure_from_options
@@ -21,7 +25,7 @@ module Moose
         end
 
         def configuration_options_instance
-          @configuration_options_instance ||= ConfigurationOptions.new(ARGV)
+          @configuration_options_instance ||= ConfigurationOptions.new(@args)
         end
 
         def trap_interrupt

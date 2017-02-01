@@ -29,6 +29,7 @@ module Moose
     }
 
     attr_accessor *DEFAULTS.keys
+    attr_accessor :run_options
 
     def initialize
       DEFAULTS.each do |key, value|
@@ -62,6 +63,10 @@ module Moose
 
     def run_test_case_with_hooks(test_case:, on_error: nil, &block)
       call_hooks_with_entity(entity: test_case, on_error: on_error, &block)
+    end
+
+    def output_strategies
+      @output_strategies ||= [$stdout]
     end
 
     alias_method :before_each_test_case, :add_before_hook

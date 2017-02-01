@@ -1,11 +1,12 @@
 module Moose
   module TestGroup
     class Builder < Base
-      attr_reader :directory, :test_group, :test_suite
+      attr_reader :directory, :test_group, :test_suite, :moose_configuration
 
-      def initialize(directory:, test_suite:)
+      def initialize(directory:, test_suite:, moose_configuration:)
         @directory = directory
         @test_suite = test_suite
+        @moose_configuration = moose_configuration
       end
 
       def build_list
@@ -16,7 +17,11 @@ module Moose
       end
 
       def collection
-        @collection ||= Collection.new(directory: directory, test_suite: test_suite)
+        @collection ||= Collection.new(
+          directory: directory,
+          test_suite: test_suite,
+          moose_configuration: moose_configuration
+        )
       end
     end
   end

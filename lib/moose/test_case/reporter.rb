@@ -47,9 +47,13 @@ module Moose
         Helpers::BacktraceHelper.new(err.backtrace).filtered_backtrace
       end
 
+      def configuration
+        @configuration ||= test_case.moose_configuration
+      end
+
       def environment_variables
         memo = ""
-        Array(Moose.configuration.environment_variables).each do |var_name|
+        Array(configuration.environment_variables).each do |var_name|
           value = ENV[var_name]
           memo += "#{var_name}=#{value} " if value
         end

@@ -10,20 +10,20 @@ module Moose
       #
       # @return [Watir::Browser] The new browser instance created
       class << self
-        def new_browser(options = {})
+        def new_browser(configuration, options = {})
           try = 0
           attempts = options.fetch(:attempts, 3)
           mutex.synchronize {
             begin
               setup_watir
-              if Moose.config.headless || options.fetch(:headless, false)
+              if configuration.headless || options.fetch(:headless, false)
                 @headless = Headless.new
                 @headless.start
                 @browser = chrome_browser
               else
                 options = {
                   :resolution => [1280,800],
-                  :browser => Moose.config.browser,
+                  :browser => configuration.browser,
                 }.merge(options)
                 res = options[:resolution]
 

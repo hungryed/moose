@@ -14,11 +14,12 @@ module Moose
 
     status_method :result
     attr_accessor :test_block, :start_time, :end_time, :result, :exception, :has_run
-    attr_reader :file, :extra_metadata, :test_group
+    attr_reader :file, :extra_metadata, :test_group, :moose_configuration
 
-    def initialize(file:, test_group:, extra_metadata: {})
+    def initialize(file:, test_group:, moose_configuration:, extra_metadata: {})
       @file = file
       @test_group = test_group
+      @moose_configuration = moose_configuration
       @extra_metadata = Hash[extra_metadata] || {}
     end
 
@@ -55,7 +56,7 @@ module Moose
       begin
         raise NoTestBlock unless test_block
         Moose.msg.banner("Running Test Case: #{trimmed_filepath}")
-        Moose.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
+        moose_configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
           test_group.test_suite.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
             test_group.configuration.call_hooks_with_entity(entity: self, on_error: :fail_with_exception) do
               begin

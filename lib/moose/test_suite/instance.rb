@@ -1,13 +1,14 @@
 module Moose
   module TestSuite
     class Instance < Base
-      attr_accessor :start_time, :end_time
+      attr_accessor :start_time, :end_time, :moose_configuration
       attr_reader :directory, :test_group_collection
       include Utilities::Inspectable
       inspector(:name)
 
-      def initialize(directory)
+      def initialize(directory, moose_configuration)
         @directory = directory
+        @moose_configuration = moose_configuration
       end
 
       def build_dependencies
@@ -61,7 +62,7 @@ module Moose
 
       def name
         @name ||= begin
-          reg = /(.*)#{config.suite_pattern.gsub(/\*/, '')}/
+          reg = /(.*)#{moose_configuration.suite_pattern.gsub(/\*/, '')}/
           directory_minus_suite_pattern = reg.match(directory)[1]
           File.basename(directory_minus_suite_pattern)
         rescue
@@ -119,11 +120,15 @@ module Moose
       end
 
       def test_group_directory_pattern
-        config.moose_test_group_directory_pattern.gsub('**', '*')
+        moose_configuration.moose_test_group_directory_pattern.gsub('**', '*')
       end
 
       def build_test_groups_from(directory)
-        test_group_builder = TestGroup::Builder.new(directory: directory, test_suite: self)
+        test_group_builder = TestGroup::Builder.new(
+          directory: directory,
+          test_suite: self,
+          moose_configuration: moose_configuration
+        )
         @test_group_collection = test_group_builder.build_list.collection
       end
     end

@@ -19,9 +19,9 @@ module Moose
       end
 
       class << self
-        def last_failed_example_filenames
-          validate_file_exists!
-          examples = YAML.load_file(status_filepath)
+        def last_failed_example_filenames(configuration)
+          validate_file_exists!(configuration)
+          examples = YAML.load_file(status_filepath(configuration))
           examples.select { |example|
             example[:result] == "FAIL"
           }.map { |example|
@@ -29,28 +29,29 @@ module Moose
           }
         end
 
-        def persist!(tests)
-          return unless filepath
-          ::FileUtils.mkdir_p(filepath)
+        def persist!(configuration, tests)
+          path = filepath(configuration)
+          return unless path
+          ::FileUtils.mkdir_p(path)
           instances = tests.map { |test|
             new(test).yamlify
           }
-          File.open(status_filepath, "w") { |f|
+          File.open(status_filepath(configuration), "w") { |f|
             f.write instances.to_yaml
           }
         end
 
         private
 
-        def validate_file_exists!
-          raise MissingPersistanceFile unless filepath
-          unless File.file?(status_filepath)
+        def validate_file_exists!(configuration)
+          raise MissingPersistanceFile unless filepath(configuration)
+          unless File.file?(status_filepath(configuration))
             raise PersistanceFileDoesNotExist
           end
         end
 
-        def status_filepath
-          File.join(filepath, file_name)
+        def status_filepath(configuration)
+          File.join(filepath(configuration), file_name)
         end
 
         def file_name
@@ -61,12 +62,8 @@ module Moose
           end
         end
 
-        def filepath
-          config.test_status_persistence_directory
-        end
-
-        def config
-          ::Moose.configuration
+        def filepath(configuration)
+          configuration.test_status_persistence_directory
         end
       end
 

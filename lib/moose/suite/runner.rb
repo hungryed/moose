@@ -3,20 +3,30 @@ require_relative "aggregator"
 module Moose
   module Suite
     class Runner
-      attr_accessor :start_time, :end_time
+      attr_accessor :start_time, :end_time, :configuration
 
       class << self
+        attr_reader :instance
+
         def run!(options = {})
           instance.run!(options)
         end
 
-        def require_files!
-          instance.test_suites
+        def require_files!(configuration)
+          build_instance(configuration).test_suites
         end
 
-        def instance
-          @instance ||= new
+        def build_instance(configuration)
+          @instance = new(configuration)
         end
+
+        def reset!
+          @instance = nil
+        end
+      end
+
+      def initialize(configuration)
+        @configuration = configuration
       end
 
       def instance_for_suite(suite_name)
@@ -26,7 +36,7 @@ module Moose
       end
 
       def test_suites
-        @test_suites ||= Aggregator.test_suites
+        @test_suites ||= Aggregator.test_suites(configuration)
       end
 
       def manage_snapshot_dir
@@ -88,7 +98,7 @@ module Moose
       end
 
       def persist_failed_tests!
-        Core::TestStatusPersistor.persist!(tests)
+        Core::TestStatusPersistor.persist!(configuration, tests)
       end
 
       def failed_tests
@@ -123,10 +133,6 @@ module Moose
           test_suite.filter_from_options!(opts)
           trimmed_test_suites << test_suite if test_suite.has_available_tests?
         }
-      end
-
-      def configuration
-        @configuration ||= Moose.configuration
       end
     end
   end

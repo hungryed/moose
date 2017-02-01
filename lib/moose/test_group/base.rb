@@ -1,10 +1,6 @@
 module Moose
   module TestGroup
     class Base
-      def moose_config
-        Moose.configuration
-      end
-
       def read_yaml_file(file)
         Utilities::YamlFileLoader.new(file).read
       end

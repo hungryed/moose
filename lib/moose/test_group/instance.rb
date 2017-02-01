@@ -4,14 +4,15 @@ module Moose
   module TestGroup
     class Instance < Base
       attr_accessor :start_time, :end_time
-      attr_reader :directory, :description, :test_suite
+      attr_reader :directory, :description, :test_suite, :moose_configuration
       include Utilities::Inspectable
       inspector(:name)
 
-      def initialize(directory:, description:, test_suite:)
+      def initialize(directory:, description:, test_suite:, moose_configuration:)
         @directory = directory
         @description = description
         @test_suite = test_suite
+        @moose_configuration = moose_configuration
         read_key_words_yamls
       end
 
@@ -141,11 +142,11 @@ module Moose
         return configuration.run_in_threads unless configuration.run_in_threads.nil?
         option_to_run_in_threads = options.fetch(:run_in_threads, nil)
         return option_to_run_in_threads unless option_to_run_in_threads.nil?
-        moose_config.run_in_threads
+        moose_configuration.run_in_threads
       end
 
       def run_in_threads(test_collection, opts = {})
-        test_collection.each_slice(moose_config.test_thread_count) do |test_case_set|
+        test_collection.each_slice(moose_configuration.test_thread_count) do |test_case_set|
           threads = []
           test_case_set.each_with_index do |test_case, index|
             threads << Thread.new do
@@ -186,6 +187,7 @@ module Moose
         test_case = TestCase.new(
           file: file,
           test_group: self,
+          moose_configuration: moose_configuration,
           extra_metadata: keywords.fetch("test cases", {}).fetch(file_name, {})
         )
         test_case.build
