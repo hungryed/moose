@@ -26,6 +26,26 @@ module Moose
         raise error_to_raise if error_to_raise
       end
 
+      def call_teardown_hooks_with_entity(entity:, on_error: nil, &block)
+        error_to_raise = nil
+        begin
+          call_hook_set(before_teardown_hooks, entity)
+          block.call
+        rescue => e
+          if on_error
+            entity.send(on_error, e)
+          end
+          error_to_raise = e
+        end
+        begin
+          call_hook_set(after_teardown_hooks, entity)
+        rescue => e
+          if on_error && !error_to_raise
+            entity.send(on_error, e)
+          end
+        end
+      end
+
       def add_before_hook(block_entity)
         before_hooks << block_entity
       end
@@ -36,6 +56,14 @@ module Moose
 
       def add_around_hook(block_entity)
         around_hooks << block_entity
+      end
+
+      def add_before_teardown_hook(block_entity)
+        before_teardown_hooks << block_entity
+      end
+
+      def add_after_teardown_hook(block_entity)
+        after_teardown_hooks << block_entity
       end
 
       private
@@ -56,6 +84,14 @@ module Moose
 
       def after_hooks
         @after_hooks ||= []
+      end
+
+      def before_teardown_hooks
+        @before_teardown_hooks ||= []
+      end
+
+      def after_teardown_hooks
+        @after_teardown_hooks ||= []
       end
 
       def around_hooks

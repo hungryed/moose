@@ -76,9 +76,15 @@ module Moose
         fail_with_exception(e)
       ensure
         self.has_run = true
-        teardown
-        self.end_time = Time.now
-        reporter.report!
+        moose_configuration.run_teardown_with_hooks(test_case: self, on_error: :fail_with_exception) do
+          test_group.test_suite.configuration.run_teardown_with_hooks(test_case: self, on_error: :fail_with_exception) do
+            test_group.configuration.call_teardown_hooks_with_entity(entity: self, on_error: :fail_with_exception) do
+              teardown
+              self.end_time = Time.now
+              reporter.report!
+            end
+          end
+        end
         self
       end
     end
@@ -133,6 +139,10 @@ module Moose
       reporter.rerun_script
     end
 
+    def reporter
+      @reporter ||= Reporter.new(self)
+    end
+
     private
 
     def short_circuit!(status, msg="short circuit")
@@ -149,10 +159,6 @@ module Moose
     def fail_with_exception(err)
       self.exception = err
       fail!
-    end
-
-    def reporter
-      @reporter ||= Reporter.new(self)
     end
 
     def teardown

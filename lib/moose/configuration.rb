@@ -69,6 +69,10 @@ module Moose
       @output_strategies ||= [$stdout]
     end
 
+
+    def run_teardown_with_hooks(test_case:, on_error: nil, &block)
+      call_teardown_hooks_with_entity(entity: test_case, on_error: on_error, &block)
+    end
     alias_method :before_each_test_case, :add_before_hook
     alias_method :after_each_test_case, :add_after_hook
     alias_method :around_each_test_case, :add_around_hook
