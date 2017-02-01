@@ -2,9 +2,10 @@ module Moose
   module Utilities
     module Message
       class Display
-        attr_reader :message, :force
+        attr_reader :message, :force, :moose_configuration
 
-        def initialize(message="", force = false)
+        def initialize(moose_configuration, message="", force = false)
+          @moose_configuration = moose_configuration
           @message = message.to_s
           @force = force
         end
@@ -14,6 +15,12 @@ module Moose
             output = message.split("\n").map{ |line| line = "DEBUG: #{line}"}.join
             puts output.swap
           end
+        end
+
+        def write_to_logs(output="")
+          message = "#{output}\n"
+          moose_configuration.log_strategies.each { |strat| strat.write(message) }
+          message
         end
 
         alias :debug_msg :debug
@@ -158,7 +165,7 @@ module Moose
         end
 
         def with_checks(&block)
-          return unless Moose.configuration.verbose || force
+          return unless moose_configuration.verbose || force
           block.call
         end
 

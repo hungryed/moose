@@ -143,6 +143,10 @@ module Moose
       @reporter ||= Reporter.new(self)
     end
 
+    def msg
+      @msg ||= Utilities::Message::Delegator.new(moose_configuration)
+    end
+
     private
 
     def short_circuit!(status, msg="short circuit")

@@ -9,6 +9,7 @@ module Moose
 
       def final_report!
         return if test_case.passed?
+        return unless test_case.has_run
         with_details do
           if test_case.failed?
             failure_script
@@ -18,6 +19,7 @@ module Moose
       end
 
       def report!
+        return unless test_case.has_run
         with_details do
           if test_case.failed?
             failure_script
@@ -37,7 +39,16 @@ module Moose
         message_with(:info, "#{environment_variables} bundle exec moose #{Moose.environment} #{test_case.trimmed_filepath}")
       end
 
+      def add_strategy(logger)
+        raise "Loggers must respond to write" unless logger.respond_to?(:write)
+        log_strategies << logger
+      end
+
       private
+
+      def log_strategies
+        @log_strategies ||= []
+      end
 
       def err
         test_case.exception
@@ -85,11 +96,17 @@ module Moose
       end
 
       def newline
-        Moose.msg.newline("", true)
+        write_message(:info, "\n")
       end
 
       def message_with(type, message)
-        Moose.msg.send(type, "\t#{message}", true)
+        write_message(type, "\t#{message}")
+      end
+
+      def write_message(type, message)
+        msg = test_case.msg.send(type, message, true)
+        logger_type = Moose.msg.logger_type_map(type)
+        log_strategies.map { |logger| logger.info(msg) }
       end
 
       def gem_dir

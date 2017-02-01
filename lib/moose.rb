@@ -32,7 +32,7 @@ module Moose
     alias_method :config, :configuration
 
     def msg
-      @msg ||= Utilities::Message::Delegator.new
+      @msg ||= Utilities::Message::Delegator.new(configuration)
     end
 
     def require_files!

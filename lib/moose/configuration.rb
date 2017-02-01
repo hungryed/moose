@@ -69,10 +69,24 @@ module Moose
       @output_strategies ||= [$stdout]
     end
 
+    def add_logger(logger)
+      raise "Loggers must respond to write" unless logger.respond_to?(:write)
+      log_strategies << logger
+    end
+
+    def remove_logger(logger)
+      log_strategies.delete(logger)
+      log_strategies
+    end
 
     def run_teardown_with_hooks(test_case:, on_error: nil, &block)
       call_teardown_hooks_with_entity(entity: test_case, on_error: on_error, &block)
     end
+
+    def log_strategies
+      @log_strategies ||= [$stdout]
+    end
+
     alias_method :before_each_test_case, :add_before_hook
     alias_method :after_each_test_case, :add_after_hook
     alias_method :around_each_test_case, :add_around_hook
