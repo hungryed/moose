@@ -3,6 +3,7 @@ require_relative 'browser'
 require_relative 'test_status'
 require_relative 'test_case/all'
 require_relative "utilities"
+require 'rspec/expectations'
 
 module Moose
   class TestCase
@@ -10,6 +11,7 @@ module Moose
     class ShortCircuit < StandardError; end
     include TestStatus
     include Utilities::Inspectable
+    include RSpec::Matchers
     inspector(:file)
 
     status_method :result
@@ -70,7 +72,7 @@ module Moose
             end
           end
         end
-      rescue => e
+      rescue Exception => e
         fail_with_exception(e)
       ensure
         self.has_run = true

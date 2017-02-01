@@ -8,7 +8,7 @@ module Moose
             call_hook_set(before_hooks, entity)
             block.call
           }
-        rescue => e
+        rescue Exception => e
           if on_error
             entity.send(on_error, e)
           end
@@ -16,7 +16,7 @@ module Moose
         end
         begin
           call_hook_set(after_hooks, entity)
-        rescue => e
+        rescue Exception => e
           if on_error && !error_to_raise
             entity.send(on_error, e)
           end
