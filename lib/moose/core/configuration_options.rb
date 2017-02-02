@@ -13,19 +13,26 @@ module Moose
         @args = args
       end
 
-      def assign_environment
-        if environment = args.shift
-          Moose.environment = environment.to_sym
+      def check_environment
+        if environment
+          Moose.environment = environment
         else
-          Moose.msg.banner("No environment specified")
           raise NoEnvironmentError.new("no environment specified")
+        end
+      end
+
+      def environment
+        @environment ||= begin
+          env = args.shift
+          env && env.to_sym
         end
       end
 
       def parse_args
         option_parser.parse!(args)
-        assign_environment
+        check_environment
         assign_run_opts
+        config
       end
 
       def config

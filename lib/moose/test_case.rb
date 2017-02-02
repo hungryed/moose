@@ -29,8 +29,16 @@ module Moose
       Moose.load_test_case_from_file(file: file, test_case: self)
     end
 
+    def test_suite_instance
+      test_group.test_suite
+    end
+
     def base_url
-      test_group.test_suite.configuration.base_url
+      test_suite_instance.configuration.base_url
+    end
+
+    def base_url_for(suite_name)
+      test_suite_instance.runner.base_url_for(suite_name)
     end
 
     def browser(index: nil, options: {})
@@ -43,7 +51,7 @@ module Moose
       end
     end
 
-    def new_browser(test_suite: test_group.test_suite, **opts)
+    def new_browser(test_suite: test_suite_instance, **opts)
       browser_instance = Moose::Browser::Instance.new(
         test_suite: test_suite,
         test_case: self,
@@ -57,9 +65,9 @@ module Moose
       self.start_time = Time.now
       begin
         raise NoTestBlock unless test_block
-        Moose.msg.banner("Running Test Case: #{trimmed_filepath}")
+        msg.banner("Running Test Case: #{trimmed_filepath}")
         moose_configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
-          test_group.test_suite.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
+          test_suite_instance.configuration.run_test_case_with_hooks(test_case: self, on_error: :fail_with_exception) do
             test_group.configuration.call_hooks_with_entity(entity: self, on_error: :fail_with_exception) do
               begin
                 result = catch(:short_circuit) do
@@ -77,7 +85,7 @@ module Moose
       ensure
         self.has_run = true
         moose_configuration.run_teardown_with_hooks(test_case: self, on_error: :fail_with_exception) do
-          test_group.test_suite.configuration.run_teardown_with_hooks(test_case: self, on_error: :fail_with_exception) do
+          test_suite_instance.configuration.run_teardown_with_hooks(test_case: self, on_error: :fail_with_exception) do
             test_group.configuration.call_teardown_hooks_with_entity(entity: self, on_error: :fail_with_exception) do
               teardown
               self.end_time = Time.now
@@ -149,13 +157,13 @@ module Moose
 
     private
 
-    def short_circuit!(status, msg="short circuit")
+    def short_circuit!(status, message="short circuit")
       found_status = find_result_status(status)
       raise ArgumentError, "#{status} not found in #{POSSIBLE_RESULTS}" unless found_status
       if found_status == self.class::FAIL
-        raise ShortCircuit, msg
+        raise ShortCircuit, message
       else
-        Moose.msg.send(status, msg)
+        msg.send(status, message)
         throw :short_circuit, found_status
       end
     end

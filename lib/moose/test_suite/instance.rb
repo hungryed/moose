@@ -1,14 +1,15 @@
 module Moose
   module TestSuite
     class Instance < Base
-      attr_accessor :start_time, :end_time, :moose_configuration
-      attr_reader :directory, :test_group_collection
+      attr_accessor :start_time, :end_time, :has_run
+      attr_reader :directory, :test_group_collection, :runner, :moose_configuration
       include Utilities::Inspectable
       inspector(:name)
 
-      def initialize(directory, moose_configuration)
+      def initialize(directory:, moose_configuration:, runner:)
         @directory = directory
         @moose_configuration = moose_configuration
+        @runner = runner
       end
 
       def build_dependencies
@@ -23,13 +24,14 @@ module Moose
       end
 
       def configuration
-        @configuration ||= ::Moose::TestSuite::Configuration.new
+        @configuration ||= ::Moose::TestSuite::Configuration.new(runner)
       end
 
       def run!(opts = {})
         return self unless test_group_collection
         self.start_time = Time.now
-        Moose.msg.banner("Running Test Suite: #{name}") if name
+        self.has_run = true
+        msg.banner("Running Test Suite: #{name}") if name
         configuration.suite_hook_collection.call_hooks_with_entity(entity: self) do
           test_group_collection.run!(opts)
         end
@@ -41,9 +43,9 @@ module Moose
         return self unless test_group_collection
         return self unless has_failed_tests?
         if name
-          Moose.msg.newline
-          Moose.msg.invert("Rerunning failed tests for #{name}")
-          Moose.msg.newline
+          msg.newline
+          msg.invert("Rerunning failed tests for #{name}")
+          msg.newline
         end
         configuration.suite_hook_collection.call_hooks_with_entity(entity: self) do
           test_group_collection.rerun_failed!(opts)
@@ -111,6 +113,10 @@ module Moose
 
       def tests
         test_group_collection.tests
+      end
+
+      def msg
+        @msg ||= Utilities::Message::Delegator.new(moose_configuration)
       end
 
       private

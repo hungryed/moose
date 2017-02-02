@@ -26,47 +26,30 @@ module Moose
     end
 
     def configuration
-      ::Moose::Configuration.instance
+      most_recent_runner ? most_recent_runner.configuration : ::Moose::Configuration.instance
     end
 
     alias_method :config, :configuration
+
+    def most_recent_runner
+      ::Moose::Suite::Runner.instance
+    end
+
+    def pre_run_reset!
+      ::Moose::Configuration.duplicate!
+    end
 
     def msg
       Utilities::Message::Delegator.new(configuration)
     end
 
-    def require_files!
-      ::Moose::Suite::Runner.require_files!(configuration)
-    end
-
-    def run!(opts = {})
-      with_cleanup {
-        ::Moose::Suite::Runner.run!(opts)
-      }
-    end
-
-    def suite
-      Suite::Runner.instance
-    end
-
     def base_url_for(suite_name)
-      instance_for_suite(suite_name).configuration.base_url
-    end
-
-    def instance_for_suite(suite_name)
-      suite_instance = suite.instance_for_suite(suite_name)
-      raise NoSuiteError.new("No suite for #{suite_name} found") unless suite_instance
-      suite_instance
+      msg.info("**** DEPRECATED ****")
+      msg.info("Use the test case base_url_for instead")
     end
 
     def configure(&block)
       ::Moose::Configuration.configure(&block)
-    end
-
-    def with_cleanup
-      ::Moose::Suite::Aggregator.reset!
-      yield
-      ::Moose::Suite::Runner.reset!
     end
 
     # Loading configurations (serially)

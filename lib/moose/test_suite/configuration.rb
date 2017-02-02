@@ -6,6 +6,11 @@ module Moose
       class MissingEnvironment < Moose::Error; end
 
       include Hook::HookHelper
+      attr_reader :runner
+
+      def initialize(runner)
+        @runner = runner
+      end
 
       def register_environment(environment, environment_hash)
         environment_cache.merge!(environment.to_sym => OpenStruct.new(environment_hash))
@@ -50,8 +55,8 @@ module Moose
       private
 
       def environment_object
-        environment_cache.fetch(Moose.environment) {
-          raise MissingEnvironment.new("no environment setup for #{Moose.environment}")
+        environment_cache.fetch(runner.environment) {
+          raise MissingEnvironment.new("no environment setup for #{runner.environment}")
         }
       end
 

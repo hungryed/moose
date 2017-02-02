@@ -8,6 +8,7 @@ module Moose
       end
 
       def summary_report!(opts)
+        return unless test_group.has_run
         test_group_name
         message_with("\ttime_elapsed: #{test_group.time_elapsed}:") if test_group.time_elapsed
         TestStatus::POSSIBLE_STATUSES.each do |status|
@@ -19,6 +20,7 @@ module Moose
       end
 
       def final_report!(opts = {})
+        return unless test_group.has_run
         return unless test_group.has_failed_tests?
         test_group_name
         test_group.filtered_test_case_cache.each do |test_case|
@@ -31,7 +33,7 @@ module Moose
       end
 
       def message_with(message, type = :info)
-        Moose.msg.send(type, "\t#{message}", true)
+        test_group.msg.send(type, "\t#{message}", true)
       end
     end
   end

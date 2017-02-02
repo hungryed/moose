@@ -157,7 +157,7 @@ MOOSE_STATUS_FILE_PREFIX=1 bundle exec moose #{ENVIRONMENT} --ft
 ### Moose Message Configuration
 
 ```ruby
-Moose.msg.configure do |config|
+Moose.configure do |config|
   # OPTIONS
   # COLOR_DEFAULTS = {
   #   :failure_font_color => :white,
@@ -184,7 +184,9 @@ Moose.msg.configure do |config|
   #   :dot_font_color => :yellow,
   # }
 
-  config.info_font_color = :green
+  config.configure_msg do |msg_config|
+    msg_config.info_font_color = :green
+  end
 end
 
 ```

@@ -36,7 +36,7 @@ module Moose
       end
 
       def rerun_script
-        message_with(:info, "#{environment_variables} bundle exec moose #{Moose.environment} #{test_case.trimmed_filepath}")
+        message_with(:info, "#{environment_variables} bundle exec moose #{run_environment} #{test_case.trimmed_filepath}")
       end
 
       def add_strategy(logger)
@@ -45,6 +45,10 @@ module Moose
       end
 
       private
+
+      def run_environment
+        test_case.test_suite_instance.runner.environment
+      end
 
       def log_strategies
         @log_strategies ||= []
@@ -64,7 +68,7 @@ module Moose
 
       def environment_variables
         memo = ""
-        Array(configuration.environment_variables).each do |var_name|
+        Array(configuration.environment_variables).uniq.each do |var_name|
           value = ENV[var_name]
           memo += "#{var_name}=#{value} " if value
         end
@@ -87,7 +91,7 @@ module Moose
         if err
           message_with(:error, err.class)
           message_with(:error, err.message)
-          Moose.msg.report_array(:error, trimmed_backtrace, true)
+          test_case.msg.report_array(:error, trimmed_backtrace, true)
         end
       end
 
@@ -105,16 +109,8 @@ module Moose
 
       def write_message(type, message)
         msg = test_case.msg.send(type, message, true)
-        logger_type = Moose.msg.logger_type_map(type)
+        logger_type = test_case.msg.logger_type_map(type)
         log_strategies.map { |logger| logger.info(msg) }
-      end
-
-      def gem_dir
-        @gem_dir ||= gem_spec.gem_dir
-      end
-
-      def gem_spec
-        @gem_spec ||= Moose.world.gem_spec
       end
     end
   end

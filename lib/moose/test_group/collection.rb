@@ -19,6 +19,7 @@ module Moose
       def run!(opts = {})
         self.start_time = Time.now
         filtered_cache.each_with_index do |test_group, i|
+          next if Moose.world.wants_to_quit
           test_group.run!(opts)
         end
         self.end_time = Time.now

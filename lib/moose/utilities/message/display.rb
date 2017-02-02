@@ -13,13 +13,16 @@ module Moose
         def debug
           with_checks do
             output = message.split("\n").map{ |line| line = "DEBUG: #{line}"}.join
-            puts output.swap
+            write_to_logs output.swap
           end
         end
 
         def write_to_logs(output="")
           message = "#{output}\n"
-          moose_configuration.log_strategies.each { |strat| strat.write(message) }
+          logger_type = delegator.logger_type_map(type)
+          moose_configuration.log_strategies.each { |strat| strat.send(logger_type, message) }
+          log_strategies.each { |strat| strat.send(logger_type, message) }
+          puts message
           message
         end
 
@@ -27,13 +30,13 @@ module Moose
 
         def standard
           with_checks do
-            puts message
+            write_to_logs message
           end
         end
 
         def dog
           with_checks do
-            puts "MOOSE BARKS!"
+            write_to_logs "MOOSE BARKS!"
           end
         end
 
@@ -45,7 +48,7 @@ module Moose
 
         def error
           with_checks do
-            puts message.send(font_color_for(:error))
+            write_to_logs message.send(font_color_for(:error))
           end
         end
 
@@ -69,7 +72,7 @@ module Moose
 
         def warn
           with_checks do
-            puts message.send(font_color_for(:warn))
+            write_to_logs message.send(font_color_for(:warn))
           end
         end
 
@@ -88,21 +91,21 @@ module Moose
 
         def info
           with_checks do
-            puts message.send(font_color_for(:info))
+            write_to_logs message.send(font_color_for(:info))
           end
         end
 
         def banner
           with_checks do
             output = ("\n*** #{message} ***\n")
-            puts output.send(font_color_for(:banner))
+            write_to_logs output.send(font_color_for(:banner))
           end
         end
 
         def header
           with_checks do
             output = "\n[#{message}]\n"
-            puts output.send(font_color_for(:header))
+            write_to_logs output.send(font_color_for(:header))
           end
         end
 
@@ -115,7 +118,7 @@ module Moose
         def case_description
           with_checks do
             output = "\n[#{message}]"
-            puts output.send(font_color_for(:case_description))
+            write_to_logs output.send(font_color_for(:case_description))
           end
         end
 
@@ -127,20 +130,20 @@ module Moose
 
         def step
           with_checks do
-            puts message.send(font_color_for(:step))
+            write_to_logs message.send(font_color_for(:step))
           end
         end
 
         def case_group
           with_checks do
             newline
-            puts message
+            write_to_logs message
           end
         end
 
         def newline
           with_checks do
-            puts
+            write_to_logs
           end
         end
 
@@ -150,7 +153,25 @@ module Moose
           end
         end
 
+        def add_logger(logger)
+          raise "Loggers must respond to write" unless logger.respond_to?(:write)
+          log_strategies << logger
+        end
+
+        def remove_logger(logger)
+          log_strategies.delete(logger)
+          log_strategies
+        end
+
         private
+
+        def delegator
+          @delegator ||= Utilities::Message::Delegator.new(moose_configuration)
+        end
+
+        def log_strategies
+          @log_strategies ||= []
+        end
 
         def font_color_for(key)
           color_configuration.send("#{key}_font_color")
@@ -161,7 +182,7 @@ module Moose
         end
 
         def color_configuration
-          @color_configuration ||= Moose.msg.configuration
+          @color_configuration ||= moose_configuration.msg_configuration
         end
 
         def with_checks(&block)
@@ -172,7 +193,7 @@ module Moose
         def with_background(key)
           font_color = font_color_for(key)
           background_color = background_color_for(key)
-          puts message.colorize(:color => font_color, :background => background_color.to_sym)
+          write_to_logs message.colorize(:color => font_color, :background => background_color.to_sym)
         end
       end
     end

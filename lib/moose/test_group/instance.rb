@@ -3,7 +3,7 @@ require 'thread'
 module Moose
   module TestGroup
     class Instance < Base
-      attr_accessor :start_time, :end_time
+      attr_accessor :start_time, :end_time, :has_run
       attr_reader :directory, :description, :test_suite, :moose_configuration
       include Utilities::Inspectable
       inspector(:name)
@@ -28,6 +28,7 @@ module Moose
 
       def run!(opts = {})
         self.start_time = Time.now
+        self.has_run = true
         if run_in_threads?(opts)
           run_in_threads(filtered_test_case_cache, opts)
         else
@@ -132,6 +133,10 @@ module Moose
         @filtered_test_case_cache ||= []
       end
 
+      def msg
+        @msg ||= Utilities::Message::Delegator.new(moose_configuration)
+      end
+
       private
 
       def reporter
@@ -174,7 +179,7 @@ module Moose
       def run_test_case(test_collection:, test_case:, options: {})
         return if Moose.world.wants_to_quit
         index = test_collection.index(test_case)
-        Moose.msg.banner("Running Test Case: #{index + 1} of #{test_collection.count}") if index
+        msg.banner("Running Test Case: #{index + 1} of #{test_collection.count}") if index
         test_case.run!(options)
       end
 

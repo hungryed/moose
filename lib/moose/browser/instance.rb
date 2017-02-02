@@ -37,10 +37,10 @@ module Moose
           ::FileUtils.mkdir_p(snapshot_path)
           file_path = File.join(snapshot_path, "#{name}")
           browser.screenshot.save(file_path)
-          Moose.msg.info("\tSNAPSHOT TAKEN: #{file_path}\n")
+          test_case.msg.info("\tSNAPSHOT TAKEN: #{file_path}\n")
           file_path
         rescue => e
-          Moose.msg.error("\t*** UNABLE TO TAKE SNAPSHOT ***")
+          test_case.msg.error("\t*** UNABLE TO TAKE SNAPSHOT ***")
           raise
         end
       end
@@ -59,7 +59,7 @@ module Moose
 
       def snapshot_path
         @snapshot_path ||= File.join(
-          Moose.suite.snapshot_directory,
+          test_case.test_suite_instance.runner.snapshot_directory,
           test_suite.name
         )
       end

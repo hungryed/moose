@@ -3,30 +3,29 @@ require_relative "aggregator"
 module Moose
   module Suite
     class Runner
-      attr_accessor :start_time, :end_time, :configuration
-
+      attr_accessor :start_time, :end_time, :configuration, :environment
       class << self
         attr_reader :instance
 
-        def run!(options = {})
-          instance.run!(options)
-        end
-
-        def require_files!(configuration)
-          build_instance(configuration).test_suites
-        end
-
-        def build_instance(configuration)
-          @instance = new(configuration)
-        end
-
-        def reset!
-          @instance = nil
+        def build_instance(configuration:, environment:)
+          @instance = new(
+            configuration: configuration,
+            environment: environment
+          )
         end
       end
 
-      def initialize(configuration)
+      def initialize(configuration:, environment:)
         @configuration = configuration
+        @environment = environment
+      end
+
+      def require_files!
+        test_suites
+      end
+
+      def base_url_for(suite_name)
+        instance_for_suite(suite_name).configuration.base_url
       end
 
       def instance_for_suite(suite_name)
@@ -36,7 +35,7 @@ module Moose
       end
 
       def test_suites
-        @test_suites ||= Aggregator.test_suites(configuration)
+        @test_suites ||= aggregator.test_suites
       end
 
       def manage_snapshot_dir
@@ -59,7 +58,7 @@ module Moose
       def run!(opts = {})
         initialize_run
         trim_test_suites_from(opts)
-        configuration.run_hook_collection.call_hooks_with_entity(entity: ::Moose) do
+        configuration.run_hook_collection.call_hooks_with_entity(entity: self) do
           run_tests(opts)
         end
         persist_failed_tests!
@@ -67,10 +66,21 @@ module Moose
         self
       end
 
+      def msg
+        @msg ||= Utilities::Message::Delegator.new(configuration)
+      end
+
     private
 
+      def aggregator
+        @aggregator ||= Aggregator.new(
+          configuration: configuration,
+          runner: self
+        )
+      end
+
       def initialize_run
-        Moose.msg.banner("Starting test run")
+        msg.banner("Starting test run")
         manage_snapshot_dir
         self.start_time = Time.now
         self.end_time = nil
@@ -79,15 +89,15 @@ module Moose
       def end_run
         print_summary_information
         self.end_time = Time.now
-        Moose.msg.newline
-        Moose.msg.banner("total time: #{time_elapsed}")
+        msg.newline
+        msg.banner("total time: #{time_elapsed}")
       end
 
       def print_summary_information
         trimmed_test_suites.each(&:time_summary_report)
         failures = failed_tests
         if failures.any?
-          Moose.msg.info("Failed Tests:")
+          msg.info("Failed Tests:")
           failures.each(&:rerun_script)
         end
       end
@@ -115,7 +125,8 @@ module Moose
 
       def run_tests(opts)
         trimmed_test_suites.each_with_index do |suite, i|
-          Moose.msg.banner("Test Suite #{i+1} of #{trimmed_test_suites.count}")
+          next if Moose.world.wants_to_quit
+          msg.banner("Test Suite #{i+1} of #{trimmed_test_suites.count}")
           suite.run!(opts)
           if configuration.rerun_failed
             suite.rerun_failed!(opts)
