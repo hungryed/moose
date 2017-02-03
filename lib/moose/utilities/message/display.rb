@@ -21,7 +21,6 @@ module Moose
           message = "#{output}\n"
           moose_configuration.log_strategies.uniq.each { |strat| strat.write(message) }
           log_strategies.uniq.each { |strat| strat.write(message) }
-          puts message
           message
         end
 
