@@ -19,9 +19,8 @@ module Moose
 
         def write_to_logs(output="")
           message = "#{output}\n"
-          logger_type = delegator.logger_type_map(type)
-          moose_configuration.log_strategies.each { |strat| strat.send(logger_type, message) }
-          log_strategies.each { |strat| strat.send(logger_type, message) }
+          moose_configuration.log_strategies.uniq.each { |strat| strat.write(message) }
+          log_strategies.uniq.each { |strat| strat.write(message) }
           puts message
           message
         end
