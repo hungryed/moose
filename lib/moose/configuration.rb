@@ -1,6 +1,7 @@
 module Moose
   class Configuration
     include Hook::HookHelper
+    include Utilities::LogHelper
     class << self
       def instance
         @instance ||= new
@@ -39,7 +40,8 @@ module Moose
       :browser => :chrome,
       :rerun_failed => false,
       :show_full_error_backtrace => false,
-      :test_status_persistence_directory => nil
+      :test_status_persistence_directory => nil,
+      :output_streams => [STDOUT],
     }
 
     attr_accessor *DEFAULTS.keys
@@ -83,16 +85,24 @@ module Moose
       create_after_hook_from(collection: run_hook_collection, block: block)
     end
 
+    def add_after_run_teardown_hook(&block)
+      create_after_teardown_hook_from(collection: run_hook_collection, block: block)
+    end
+
+    def add_before_run_teardown_hook(&block)
+      create_before_teardown_hook_from(collection: run_hook_collection, block: block)
+    end
+
+    def run_teardown_hooks_with_entity(entity:, &block)
+      run_hook_collection.call_teardown_hooks_with_entity(entity: entity, raise_error: true, &block)
+    end
+
     def run_test_case_with_hooks(test_case:, on_error: nil, &block)
       call_hooks_with_entity(entity: test_case, on_error: on_error, &block)
     end
 
-    def output_strategies
-      @output_strategies ||= [$stdout]
-    end
-
     def add_logger(logger)
-      raise "Loggers must respond to write" unless logger.respond_to?(:write)
+      validate_logger!(logger)
       log_strategies << logger
     end
 
@@ -106,7 +116,7 @@ module Moose
     end
 
     def log_strategies
-      @log_strategies ||= [$stdout]
+      @log_strategies ||= []
     end
 
     def configure_msg
@@ -120,6 +130,9 @@ module Moose
     alias_method :before_each_test_case, :add_before_hook
     alias_method :after_each_test_case, :add_after_hook
     alias_method :around_each_test_case, :add_around_hook
+
+    alias_method :before_each_test_case_teardown, :add_before_teardown_hook
+    alias_method :after_each_test_case_teardown, :add_after_teardown_hook
 
     private
 

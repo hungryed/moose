@@ -62,7 +62,9 @@ module Moose
           run_tests(opts)
         end
         persist_failed_tests!
-        end_run
+        configuration.run_teardown_hooks_with_entity(entity: self) do
+          end_run
+        end
         self
       end
 

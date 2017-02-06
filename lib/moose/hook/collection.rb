@@ -26,7 +26,7 @@ module Moose
         raise error_to_raise if error_to_raise
       end
 
-      def call_teardown_hooks_with_entity(entity:, on_error: nil, &block)
+      def call_teardown_hooks_with_entity(entity:, on_error: nil, raise_error: false, &block)
         error_to_raise = nil
         begin
           call_hook_set(before_teardown_hooks, entity)
@@ -43,7 +43,10 @@ module Moose
           if on_error && !error_to_raise
             entity.send(on_error, e)
           end
+          error_to_raise ||= e
         end
+
+        raise error_to_raise if raise_error && error_to_raise
       end
 
       def add_before_hook(block_entity)

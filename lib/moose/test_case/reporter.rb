@@ -39,19 +39,10 @@ module Moose
         message_with(:info, "#{environment_variables} bundle exec moose #{run_environment} #{test_case.trimmed_filepath}")
       end
 
-      def add_strategy(logger)
-        raise "Loggers must respond to write" unless logger.respond_to?(:write)
-        log_strategies << logger
-      end
-
       private
 
       def run_environment
         test_case.test_suite_instance.runner.environment
-      end
-
-      def log_strategies
-        @log_strategies ||= []
       end
 
       def err
@@ -108,9 +99,7 @@ module Moose
       end
 
       def write_message(type, message)
-        msg = test_case.msg.send(type, message, true)
-        logger_type = test_case.msg.logger_type_map(type)
-        log_strategies.map { |logger| logger.info(msg) }
+        test_case.msg.send(type, message, true)
       end
     end
   end

@@ -25,8 +25,8 @@ module Moose
         hook_collection.call_hooks_with_entity(entity: entity, on_error: on_error, &block)
       end
 
-      def call_teardown_hooks_with_entity(entity:, on_error: nil, &block)
-        hook_collection.call_teardown_hooks_with_entity(entity: entity, on_error: on_error, &block)
+      def call_teardown_hooks_with_entity(entity:, on_error: nil, raise_error: false, &block)
+        hook_collection.call_teardown_hooks_with_entity(entity: entity, on_error: on_error, raise_error: raise_error, &block)
       end
 
       def create_before_hook_from(collection: hook_collection, block:)

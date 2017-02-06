@@ -2,26 +2,23 @@ module Moose
   module Utilities
     module Message
       class Display
-        attr_reader :message, :force, :moose_configuration
+        include Utilities::LogHelper
 
-        def initialize(moose_configuration, message="", force = false)
+        attr_reader :message, :force, :moose_configuration, :delegator
+
+        def initialize(moose_configuration, delegator, message="", force = false)
           @moose_configuration = moose_configuration
+          @delegator = delegator
           @message = message.to_s
           @force = force
         end
 
         def debug
+          @level = __method__
           with_checks do
             output = message.split("\n").map{ |line| line = "DEBUG: #{line}"}.join
             write_to_logs output.swap
           end
-        end
-
-        def write_to_logs(output="")
-          message = "#{output}\n"
-          moose_configuration.log_strategies.uniq.each { |strat| strat.write(message) }
-          log_strategies.uniq.each { |strat| strat.write(message) }
-          message
         end
 
         alias :debug_msg :debug
@@ -39,12 +36,14 @@ module Moose
         end
 
         def failure
+          @level = __method__
           with_checks do
             with_background(:failure)
           end
         end
 
         def error
+          @level = __method__
           with_checks do
             write_to_logs message.send(font_color_for(:error))
           end
@@ -145,30 +144,26 @@ module Moose
           end
         end
 
-        def dot
-          with_checks do
-            print '.'.send(font_color_for(:dot))
-          end
-        end
-
-        def add_logger(logger)
-          raise "Loggers must respond to write" unless logger.respond_to?(:write)
-          log_strategies << logger
-        end
-
-        def remove_logger(logger)
-          log_strategies.delete(logger)
-          log_strategies
-        end
-
         private
 
-        def delegator
-          @delegator ||= Utilities::Message::Delegator.new(moose_configuration)
+        def log_strategies
+          moose_configuration.log_strategies + delegator.log_strategies
         end
 
-        def log_strategies
-          @log_strategies ||= []
+        def output_streams
+          moose_configuration.output_streams + delegator.io_strategies
+        end
+
+        def write_to_logs(output="")
+          send_message_to(
+            loggers: log_strategies,
+            type: @level,
+            message: output
+          )
+          puts_message_to(
+            streams: output_streams,
+            message: output
+          )
         end
 
         def font_color_for(key)
