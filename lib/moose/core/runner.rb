@@ -15,6 +15,11 @@ module Moose
             exit!(1) if Moose.world.wants_to_quit
             Moose.world.wants_to_quit = true
             STDERR.puts "\nExiting... Interrupt again to exit immediately."
+            begin
+              throw(:short_circuit, "skipped")
+            rescue ArgumentError => e
+              raise e unless e.message =~ /uncaught throw \:short_circuit/
+            end
           end
           @already_trapped = true
         end
