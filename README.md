@@ -307,6 +307,25 @@ module Application
 end
 ```
 
+To override the path on specific runs:
+```ruby
+require_relative '../menu/user_menu_section.rb'
+module Application
+  module Home
+    class SearchPage < Moose::Page::Full
+      self.path '/search'
+
+      # This method will be the overridable path for this specific run
+      def _path
+        original_path = super
+        return original_path unless ENV["SEARCH_PAGE_PARAMS"]
+        original_path + "?#{ENV['SEARCH_PAGE_PARAMS']}"
+      end
+    end
+  end
+end
+```
+
 ### Section Configuration
 
 Sections are similar to Pages, except the Moose inheritance is different and that they contain no path

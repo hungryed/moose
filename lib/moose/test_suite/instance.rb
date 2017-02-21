@@ -133,7 +133,8 @@ module Moose
         test_group_builder = TestGroup::Builder.new(
           directory: directory,
           test_suite: self,
-          moose_configuration: moose_configuration
+          moose_configuration: moose_configuration,
+          runner: runner,
         )
         @test_group_collection = test_group_builder.build_list.collection
       end

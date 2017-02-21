@@ -103,6 +103,14 @@ module Moose
 
       private
 
+      def run_environment
+        browser && browser.run_environment
+      end
+
+      def moose_run
+        browser && browser.moose_run
+      end
+
       def add_element_methods # :nodoc:
         self.class.elements.each do |element_name,element_block|
           add_block_method(element_name, element_block)

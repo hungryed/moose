@@ -16,12 +16,13 @@ module Moose
 
     status_method :result
     attr_accessor :test_block, :start_time, :end_time, :result, :exception, :has_run
-    attr_reader :file, :extra_metadata, :test_group, :moose_configuration
+    attr_reader :file, :extra_metadata, :test_group, :moose_configuration, :runner
 
-    def initialize(file:, test_group:, moose_configuration:, extra_metadata: {})
+    def initialize(file:, test_group:, moose_configuration:, extra_metadata: {}, runner:)
       @file = file
       @test_group = test_group
       @moose_configuration = moose_configuration
+      @runner = runner
       begin
         @extra_metadata = Hash[extra_metadata] || {}
       rescue => e
@@ -31,6 +32,10 @@ module Moose
 
     def build
       Moose.load_test_case_from_file(file: file, test_case: self)
+    end
+
+    def run_environment
+      runner.environment
     end
 
     def test_suite_instance
@@ -58,6 +63,7 @@ module Moose
     def new_browser(test_suite: test_suite_instance, **opts)
       browser_instance = Moose::Browser::Instance.new(
         test_suite: test_suite,
+        moose_run: runner,
         test_case: self,
         browser_options: opts
       )

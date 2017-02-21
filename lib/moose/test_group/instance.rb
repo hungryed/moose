@@ -4,15 +4,16 @@ module Moose
   module TestGroup
     class Instance < Base
       attr_accessor :start_time, :end_time, :has_run
-      attr_reader :directory, :description, :test_suite, :moose_configuration
+      attr_reader :directory, :description, :test_suite, :moose_configuration, :runner
       include Utilities::Inspectable
       inspector(:name)
 
-      def initialize(directory:, description:, test_suite:, moose_configuration:)
+      def initialize(directory:, description:, test_suite:, moose_configuration:, runner:)
         @directory = directory
         @description = description
         @test_suite = test_suite
         @moose_configuration = moose_configuration
+        @runner = runner
         read_key_words_yamls
       end
 
@@ -193,7 +194,8 @@ module Moose
           file: file,
           test_group: self,
           moose_configuration: moose_configuration,
-          extra_metadata: metadata_for(file_name)
+          runner: runner,
+          extra_metadata: metadata_for(file_name),
         )
         test_case.build
         test_case_cache << test_case
@@ -204,7 +206,7 @@ module Moose
       end
 
       def default_metadata_for(file_name)
-        if moose_configuration.verify_test_case_definition 
+        if moose_configuration.verify_test_case_definition
           msg.warn("#{file_name} is missing from #{trimmed_file_path(directory)}/test_case.yml")
         end
         {}
@@ -224,7 +226,9 @@ module Moose
 
       def read_key_words_yamls
         Dir.glob(File.join(directory, "/*.yml")) do |f|
-          keywords.merge!(read_yaml_file(f))
+          if data = read_yaml_file(f)
+            keywords.merge!(data) if data.is_a?(Hash)
+          end
         end
       end
     end

@@ -4,13 +4,14 @@ require_relative "../utilities"
 module Moose
   module Browser
     class Instance
-      attr_reader :test_suite, :test_case, :browser_options
+      attr_reader :test_suite, :test_case, :browser_options, :moose_run
       include Utilities::Inspectable
 
-      def initialize(test_suite:, test_case: ,browser_options: {})
+      def initialize(test_suite:, test_case: ,browser_options: {}, moose_run:)
         @test_suite = test_suite
         @test_case = test_case
         @browser_options = browser_options
+        @moose_run = moose_run
         @closed = false
         watir_browser
       end
@@ -24,6 +25,10 @@ module Moose
           Moose::Browser::Handler.close_browser(watir_browser)
           @closed = true
         end
+      end
+
+      def run_environment
+        test_case.run_environment
       end
 
       # Take a screen shot of the browser and save in given directory

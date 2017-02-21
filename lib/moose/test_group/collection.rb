@@ -2,12 +2,13 @@ module Moose
   module TestGroup
     class Collection < Base
       attr_accessor :start_time, :end_time
-      attr_reader :directory, :test_suite, :moose_configuration
+      attr_reader :directory, :test_suite, :moose_configuration, :runner
 
-      def initialize(directory:, test_suite:, moose_configuration:)
+      def initialize(directory:, test_suite:, moose_configuration:, runner:)
         @directory = directory
         @test_suite = test_suite
         @moose_configuration = moose_configuration
+        @runner = runner
         read_description_yaml
       end
 
@@ -108,7 +109,8 @@ module Moose
           directory: directory,
           description: description_for(directory_key),
           moose_configuration: moose_configuration,
-          test_suite: test_suite
+          test_suite: test_suite,
+          runner: runner,
         )
         instance.build
         instance

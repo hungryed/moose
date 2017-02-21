@@ -28,7 +28,6 @@ module Moose
           :warn_font_color => :yellow,
           :error_font_color => :red,
           :step_font_color => :yellow,
-          :dot_font_color => :yellow,
         }
 
         attr_accessor *COLOR_DEFAULTS.keys
