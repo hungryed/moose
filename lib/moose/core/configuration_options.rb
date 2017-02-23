@@ -10,7 +10,8 @@ module Moose
       attr_reader :args
 
       def initialize(args)
-        @args = args
+        @original_arguments = args
+        @args = args.dup
       end
 
       def check_environment
@@ -40,7 +41,7 @@ module Moose
       end
 
       def assign_run_opts
-        config.run_options = args
+        config.run_options = @original_arguments
       end
 
       def configure_from_options
