@@ -119,6 +119,7 @@ Moose.configure do |config|
   #   :rerun_failed => false,
   #   :show_full_error_backtrace => false,
   #   :test_status_persistence_directory => nil,
+  #   :verify_test_case_definition => true,
   # }
 
   config.verbose = true

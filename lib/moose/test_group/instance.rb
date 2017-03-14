@@ -193,10 +193,25 @@ module Moose
           file: file,
           test_group: self,
           moose_configuration: moose_configuration,
-          extra_metadata: keywords.fetch("test cases", {}).fetch(file_name, {})
+          extra_metadata: metadata_for(file_name)
         )
         test_case.build
         test_case_cache << test_case
+      end
+
+      def metadata_for(file_name)
+        test_case_keywords.fetch(file_name) { default_metadata_for(file_name) }
+      end
+
+      def default_metadata_for(file_name)
+        if moose_configuration.verify_test_case_definition 
+          msg.warn("#{file_name} is missing from #{trimmed_file_path(directory)}/test_case.yml")
+        end
+        {}
+      end
+
+      def test_case_keywords
+        keywords["test cases"] || keywords["test_cases"] || {}
       end
 
       def test_case_cache

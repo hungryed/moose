@@ -42,6 +42,7 @@ module Moose
       :show_full_error_backtrace => false,
       :test_status_persistence_directory => nil,
       :output_streams => [STDOUT],
+      :verify_test_case_definition => true,
     }
 
     attr_accessor *DEFAULTS.keys
