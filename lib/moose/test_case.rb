@@ -22,7 +22,11 @@ module Moose
       @file = file
       @test_group = test_group
       @moose_configuration = moose_configuration
-      @extra_metadata = Hash[extra_metadata] || {}
+      begin
+        @extra_metadata = Hash[extra_metadata] || {}
+      rescue => e
+        @extra_metadata = {}
+      end
     end
 
     def build
