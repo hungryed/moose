@@ -120,6 +120,7 @@ Moose.configure do |config|
   #   :show_full_error_backtrace => false,
   #   :test_status_persistence_directory => nil,
   #   :verify_test_case_definition => true,
+  #   :status_file_prefix => nil,
   # }
 
   config.verbose = true
@@ -147,12 +148,12 @@ bundle exec moose #{ENVIRONMENT} --ft
 
 If you are running in multiple tabs then you can also save your test statuses to different files with:
 ```
-MOOSE_STATUS_FILE_PREFIX=1 bundle exec moose #{ENVIRONMENT}
+bundle exec moose #{ENVIRONMENT} --status_file_prefix="1"
 ```
 
 then to rerun those failed tests you just:
 ```
-MOOSE_STATUS_FILE_PREFIX=1 bundle exec moose #{ENVIRONMENT} --ft
+bundle exec moose #{ENVIRONMENT} --ft --status_file_prefix="1"
 ```
 
 ### Moose Message Configuration

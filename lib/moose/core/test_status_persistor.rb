@@ -51,11 +51,11 @@ module Moose
         end
 
         def status_filepath(configuration)
-          File.join(filepath(configuration), file_name)
+          File.join(filepath(configuration), file_name(configuration))
         end
 
-        def file_name
-          if prefix = ENV["MOOSE_STATUS_FILE_PREFIX"]
+        def file_name(configuration)
+          if prefix = configuration.status_file_prefix
             "#{prefix}_#{FILENAME}"
           else
             FILENAME

@@ -43,6 +43,7 @@ module Moose
       :test_status_persistence_directory => nil,
       :output_streams => [STDOUT],
       :verify_test_case_definition => true,
+      :status_file_prefix => nil,
     }
 
     attr_accessor *DEFAULTS.keys

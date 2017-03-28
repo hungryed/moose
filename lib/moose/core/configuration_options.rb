@@ -42,6 +42,9 @@ module Moose
 
       def assign_run_opts
         config.run_options = @original_arguments
+        if file_prefix = ENV["MOOSE_STATUS_FILE_PREFIX"]
+          config.status_file_prefix = file_prefix
+        end
       end
 
       def configure_from_options
@@ -156,6 +159,10 @@ module Moose
 
               add_group_filter(filter_type, group)
             end
+          end
+
+          parser.on("--status_file_prefix=VALUE", String, "Specify the status file to save and/or read to") do |status_file_prefix|
+            parsed_args.status_file_prefix = status_file_prefix
           end
         end
       end
