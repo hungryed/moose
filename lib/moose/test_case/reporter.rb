@@ -25,7 +25,7 @@ module Moose
             failure_script
           elsif test_case.passed?
             passed_script
-          else
+          elsif test_case.skipped?
             skipped_script
           end
         end
@@ -93,7 +93,7 @@ module Moose
       end
 
       def skipped_script
-        message_with(:skipped, "TEST SKIPPED!")
+        message_with(:skipped, "TEST Skipped!")
       end
 
       def newline
