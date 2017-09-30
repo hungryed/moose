@@ -41,7 +41,7 @@ module Moose
         end
 
         def build_color_methods(meth)
-          class_eval do
+          self.class.class_eval do
             define_method(meth) do
               instance_variable_get("@#{meth}")
             end
