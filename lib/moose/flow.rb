@@ -95,7 +95,7 @@ module Moose
     end
 
     def define_memoized_method(meth, return_value)
-      class_eval do
+      self.class.class_eval do
         define_method(meth) do
           if memoizied = instance_variable_get("@#{meth}")
             memoizied

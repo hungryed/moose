@@ -114,7 +114,7 @@ module Moose
           klass = section_details.fetch(:klass)
           section_block = section_details.fetch(:block)
 
-          class_eval do
+          self.class.class_eval do
             define_method(section_name) do
               if memoizied = instance_variable_get("@#{section_name}")
                 memoizied
@@ -136,7 +136,7 @@ module Moose
           klass = section_details.fetch(:klass)
           section_block = section_details.fetch(:block)
 
-          class_eval do
+          self.class.class_eval do
             define_method(section_name) do
               if memoizied = instance_variable_get("@#{section_name}")
                 memoizied
@@ -153,7 +153,7 @@ module Moose
       end
 
       def add_block_method(method_name, block) # :nodoc:
-        class_eval do
+        self.class.class_eval do
           define_method(method_name) do |*args|
             self.instance_exec(*args, &block)
           end
