@@ -47,7 +47,6 @@ module Moose
             ensure
               reset_watir_timeout
             end
-            Moose.msg.info("Created new Watir browser object! pid #{browser_pid(@browser)}")
             @browser
           }
         end
@@ -58,21 +57,19 @@ module Moose
         # @param [Watir::Browser] b The browser to close
         def close_browser b
           begin
-            pid = browser_pid(b)
-            Moose.msg.info("Closing Watir browser! pid #{pid}")
-            b.quit
+            Moose.msg.info("Closing Watir browser!")
+            b.close
           rescue => e
             Moose.msg.error("Unable to close browser using Watir browser.close! - #{e.message}")
-            Moose.msg.info("Going to kill pid #{pid}")
             begin
-              ::Process.kill('KILL', pid)
+              b.quit
             rescue Errno::ESRCH => e
               Moose.msg.error("Unable to kill browser using Process.kill!")
             else
-              Moose.msg.info("Killed browser! pid #{pid}")
+              Moose.msg.info("Killed browser!")
             end
           else
-            Moose.msg.info("Closed browser! pid #{pid}")
+            Moose.msg.info("Closed browser!")
           end
         end
 
@@ -98,13 +95,6 @@ module Moose
         def chrome_browser
           driver = Selenium::WebDriver.for :chrome, detach: false
           Watir::Browser.new(driver)
-        end
-
-        # Return the pid of the given browser
-        # @param [Watir::Browser] Determine the pid of this browser
-        # @return [String] The pid in question
-        def browser_pid(browser)
-          browser.driver.instance_variable_get(:@bridge).instance_variable_get(:@service).instance_variable_get(:@process).pid
         end
       end
     end
