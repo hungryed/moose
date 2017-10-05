@@ -9,8 +9,6 @@ module Moose
     attr_reader :browser
 
     class << self
-      alias_method :old_new, :new
-
       def pages
         @pages ||= {}
       end
@@ -36,12 +34,15 @@ module Moose
         browser
       end
 
-      def new(browser:, *args)
-        inst = old_new(*args)
+      def new(browser:, **args)
+        inst = super(**args)
         inst.instance_variable_set(:@browser, validate_browser(browser))
         inst.send(:_add_page_methods)
         inst
       end
+    end
+
+    def initialize(**)
     end
 
     private

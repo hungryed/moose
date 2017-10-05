@@ -106,22 +106,21 @@ Moose.configure do |config|
   end
 
   # OPTIONS
-  # DEFAULTS = {
-  #   :verbose => false,
-  #   :snapshot_directory => "snapshots",
-  #   :snapshots => false,
-  #   :moose_test_group_directory_pattern => "test_groups/**",
-  #   :suite_pattern => "*_suite/",
-  #   :run_in_threads => false,
-  #   :test_thread_count => 5,
-  #   :headless => false,
-  #   :browser => :chrome,
-  #   :rerun_failed => false,
-  #   :show_full_error_backtrace => false,
-  #   :test_status_persistence_directory => nil,
-  #   :verify_test_case_definition => true,
-  #   :status_file_prefix => nil,
-  # }
+  # DEFAULTS ARE:
+  #   config.verbose #=> false,
+  #   config.snapshot_directory #=> "snapshots",
+  #   config.snapshots #=> false,
+  #   config.moose_test_group_directory_pattern #=> "test_groups/**",
+  #   config.suite_pattern #=> "*_suite/",
+  #   config.run_in_threads #=> false,
+  #   config.test_thread_count #=> 5,
+  #   config.headless #=> false,
+  #   config.browser #=> :chrome,
+  #   config.rerun_failed #=> false,
+  #   config.show_full_error_backtrace #=> false,
+  #   config.test_status_persistence_directory #=> nil,
+  #   config.verify_test_case_definition #=> true,
+  #   config.status_file_prefix #=> nil,
 
   config.verbose = true
   config.run_in_threads = true
@@ -294,7 +293,7 @@ module Application
       self.path '/search'
       element(:a_element) { browser.a(:id, 'link_somewhere') }
       section(:search_results, Application::Home::SearchRestultSection) { browser }
-      section(:different_name_space, Application::Menu::UserMenuSection) { browser }
+      section(:different_name_space, Application::Menu::UserMenuSection) { browser.div(id: "user-menu-section") }
       def click_on_a
         a_element.click
       end
@@ -355,8 +354,7 @@ Flows can contain more than one page. You can instantiate a Flow within a Flow l
 module Application
   module Home
     class SearchFlow < Moose::Flow
-    # :browser is always a required initiliazing attribute
-      initial_attributes(:test_case) # adds required initializer attributes
+      # :browser is always a required initiliazing attribute
       page(:search_page, Application::Home::SearchPage)
 
       def open_link
@@ -370,9 +368,9 @@ end
 # Instantiating a Flow
 
 Application::Home::SearchFlow.new(
-    :browser => browser
-    :test_case => 'Search test case'
-  )
+  :browser => browser
+  :test_case => 'Search test case'
+)
 ```
 
 ### Flows, Pages, and Sections
