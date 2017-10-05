@@ -159,33 +159,34 @@ bundle exec moose #{ENVIRONMENT} --ft --status_file_prefix="1"
 
 ```ruby
 Moose.configure do |config|
-  # OPTIONS
-  # COLOR_DEFAULTS = {
-  #   :failure_font_color => :white,
-  #   :failure_background_color => :red,
-  #   :pass_font_color => :white,
-  #   :pass_background_color => :green,
-  #   :pending_font_color => :white,
-  #   :pending_background_color => :magenta,
-  #   :skipped_font_color => :white,
-  #   :skipped_background_color => :light_red,
-  #   :incomplete_font_color => :white,
-  #   :incomplete_background_color => :yellow,
-  #   :invert_font_color => :white,
-  #   :invert_background_color => :black,
-  #   :name_font_color => :white,
-  #   :name_background_color => :cyan,
-  #   :case_description_font_color => :cyan,
-  #   :banner_font_color => :blue,
-  #   :info_font_color => :blue,
-  #   :header_font_color => :cyan,
-  #   :warn_font_color => :yellow,
-  #   :error_font_color => :red,
-  #   :step_font_color => :yellow,
-  #   :dot_font_color => :yellow,
-  # }
 
   config.configure_msg do |msg_config|
+    # OPTIONS
+    # DEFAULTS ARE:
+    #   msg_config.failure_font_color #=> :white,
+    #   msg_config.failure_background_color #=> :red,
+    #   msg_config.pass_font_color #=> :white,
+    #   msg_config.pass_background_color #=> :green,
+    #   msg_config.pending_font_color #=> :white,
+    #   msg_config.pending_background_color #=> :magenta,
+    #   msg_config.skipped_font_color #=> :white,
+    #   msg_config.skipped_background_color #=> :light_red,
+    #   msg_config.incomplete_font_color #=> :white,
+    #   msg_config.incomplete_background_color #=> :yellow,
+    #   msg_config.invert_font_color #=> :white,
+    #   msg_config.invert_background_color #=> :black,
+    #   msg_config.name_font_color #=> :white,
+    #   msg_config.name_background_color #=> :cyan,
+    #   msg_config.case_description_font_color #=> :cyan,
+    #   msg_config.banner_font_color #=> :blue,
+    #   msg_config.info_font_color #=> :blue,
+    #   msg_config.header_font_color #=> :cyan,
+    #   msg_config.warn_font_color #=> :yellow,
+    #   msg_config.error_font_color #=> :red,
+    #   msg_config.step_font_color #=> :yellow,
+    #   msg_config.dot_font_color #=> :yellow,
+
+
     msg_config.info_font_color = :green
   end
 end
