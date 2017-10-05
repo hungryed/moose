@@ -26,14 +26,16 @@ module Moose
       end
 
       def start_of_trace
-        i = backtrace.index { |backtrace_path|
-          !(backtrace_path.to_s =~ /^#{gem_dir}\//)
-        }
-        backtrace[i..-1] if i
+        @start_of_trace ||= begin
+          i = backtrace.index { |backtrace_path|
+            !(backtrace_path.to_s =~ /^#{gem_dir}\//)
+          }
+          backtrace[i..-1] if i
+        end
       end
 
       def configuration
-        Moose.configuration
+        @configuration ||= Moose.configuration
       end
 
       def gem_dir

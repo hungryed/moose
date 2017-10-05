@@ -6,7 +6,9 @@ module Moose
       class << self
         def invoke(args = ARGV)
           trap_interrupt
-          new(args).run!
+          instance = new(args)
+          instance.configure!
+          instance.run!
         end
 
         def trap_interrupt
@@ -29,11 +31,14 @@ module Moose
         @args = args
       end
 
-      def run!
+      def configure!
         configuration_options_instance.parse_args
         runner.require_files!
         ::Moose.pre_run_reset!
         configure_from_options
+      end
+
+      def run!
         runner.run!(run_options)
       end
 
