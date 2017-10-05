@@ -349,13 +349,17 @@ Flows are in place to DRY the test cases, having test cases contain logic leads 
 Also, a Flow is not only a single interaction with an Element on a Page, it is a set of interactions that lead to a result.
 Almost always a Flow method should return something to the Test Case.
 
-Flows can contain more than one page. You can instantiate a Flow within a Flow like instantianting a new Class in plain ruby.
+Flows can contain more than one page. To create a flow you will need a browser. You can instantiate a Flow within a Flow like instantianting a new Class in plain ruby.
 ```ruby
 module Application
   module Home
     class SearchFlow < Moose::Flow
       # :browser is always a required initiliazing attribute
       page(:search_page, Application::Home::SearchPage)
+
+      def initialize(test_case:)
+        @test_case = test_case
+      end
 
       def open_link
         search_page.click_on_a
