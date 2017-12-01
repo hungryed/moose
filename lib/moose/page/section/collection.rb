@@ -1,6 +1,6 @@
 module Moose
   module Page
-    class Section < Base
+    class Section
       class Collection
         include Enumerable
         attr_reader :browser, :element_block, :parent, :klass
