@@ -5,7 +5,9 @@ module Moose
       class SectionError < Moose::Error; end
 
       def self.included(klass)
-        klass.extend(ClassMethods)
+        class << klass
+          prepend ClassMethods
+        end
         klass.include(InstanceMethods)
         klass.send(:attr_reader, :browser)
         klass.include(Utilities::Inspectable)
@@ -14,6 +16,17 @@ module Moose
       end
 
       module ClassMethods
+        def included(klass)
+          klass.extend(ClassMethods)
+          klass.include(InstanceMethods)
+          klass.send(:attr_reader, :browser)
+          klass.include(Utilities::Inspectable)
+          klass.inspector(:browser)
+          klass.include(Actions)
+          klass.merge_items(self)
+          super
+        end
+
         def elements
           parent_elements.merge(self_elements)
         end
@@ -88,6 +101,12 @@ module Moose
           klass.parent_elements.merge!(elements)
           klass.parent_sections.merge!(sections)
           klass.parent_section_collections.merge!(section_collections)
+        end
+
+        def merge_items(klass)
+          parent_elements.merge!(klass.elements)
+          parent_sections.merge!(klass.sections)
+          parent_section_collections.merge!(klass.section_collections)
         end
       end
 
