@@ -19,7 +19,7 @@ module Moose
               if configuration.headless || options.fetch(:headless, false)
                 @headless = Headless.new
                 @headless.start
-                @browser = chrome_browser
+                @browser = chrome_browser("--headless")
               else
                 options = {
                   :resolution => [1280,800],
@@ -92,8 +92,10 @@ module Moose
         # otherwise only the chromedriver process is killed and we are left with
         # orphaned browsers.
         # @return [Watir::Browser] a new browser instance
-        def chrome_browser
-          driver = Selenium::WebDriver.for :chrome, detach: false
+        def chrome_browser(*opts)
+          options = Selenium::WebDriver::Chrome::Options.new
+          opts.each { |n| options.add_argument(n) }
+          driver = Selenium::WebDriver.for :chrome, detach: false, options: options
           Watir::Browser.new(driver)
         end
       end
