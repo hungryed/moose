@@ -19,7 +19,7 @@ module Moose
               if configuration.headless || options.fetch(:headless, false)
                 @headless = Headless.new
                 @headless.start
-                @browser = chrome_browser("--headless")
+                @browser = chrome_browser("--headless", "--window-size=1280,800")
               else
                 options = {
                   :resolution => [1280,800],
